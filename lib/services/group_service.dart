@@ -12,7 +12,8 @@ class GroupService {
   Future<Group> createGroup({
     required String name,
     required String type,
-    required String frequency,
+    required int frequencyValue,
+    required String frequencyUnit,
     required double amount,
     String currency = 'XOF',
     String? description,
@@ -21,7 +22,8 @@ class GroupService {
     final res = await _dio.post('/groups', data: {
       'name': name,
       'type': type,
-      'frequency': frequency,
+      'frequencyValue': frequencyValue,
+      'frequencyUnit': frequencyUnit,
       'amount': amount,
       'currency': currency,
       if (description != null) 'description': description,
@@ -44,7 +46,8 @@ class GroupService {
   Future<Group> updateGroup({
     required String id,
     required String name,
-    required String frequency,
+    required int frequencyValue,
+    required String frequencyUnit,
     required double amount,
     required String currency,
     String? description,
@@ -52,7 +55,8 @@ class GroupService {
   }) async {
     final res = await _dio.put('/groups/$id', data: {
       'name': name,
-      'frequency': frequency,
+      'frequencyValue': frequencyValue,
+      'frequencyUnit': frequencyUnit,
       'amount': amount,
       'currency': currency,
       if (description != null) 'description': description,
@@ -129,15 +133,6 @@ class GroupService {
     return list.map((j) => Contribution.fromJson(j)).toList();
   }
 
-  Future<void> createCycle({
-    required String groupId,
-    required DateTime dueDate,
-  }) async {
-    await _dio.post('/groups/$groupId/contributions/cycle', data: {
-      'dueDate': dueDate.toIso8601String(),
-    });
-  }
-
   Future<void> markReceived(String contributionId, {String? note}) async {
     await _dio.patch('/groups/contributions/$contributionId/received', data: {
       if (note != null) 'note': note,
@@ -153,6 +148,69 @@ class GroupService {
   Future<Map<String, dynamic>> getCycleRecap(String groupId) async {
     final res = await _dio.get('/groups/$groupId/recap');
     return res.data['data'];
+  }
+
+  // ── CYCLES (tours de rotation) ────────────────────────────────────────────
+
+  /// Démarre un nouveau cycle : génère automatiquement tout le calendrier
+  /// des tours (un par membre) ainsi que les cotisations correspondant à
+  /// chaque date de tour.
+  Future<Map<String, dynamic>> startCycle({
+    required String groupId,
+    required DateTime startDate,
+  }) async {
+    final res = await _dio.post('/groups/$groupId/cycles/start', data: {
+      'startDate': startDate.toIso8601String(),
+    });
+    return res.data;
+  }
+
+  Future<Map<String, dynamic>> closeCycle(String groupId) async {
+    final res = await _dio.post('/groups/$groupId/cycles/close');
+    return res.data;
+  }
+
+  Future<List<Map<String, dynamic>>> getCycleHistory(String groupId) async {
+    final res = await _dio.get('/groups/$groupId/cycles');
+    final list = res.data['data'] as List;
+    return list.cast<Map<String, dynamic>>();
+  }
+
+  /// Reprogramme la date d'un tour. Répercute automatiquement le changement
+  /// sur les cotisations de ce même tour (même date d'échéance).
+  Future<void> rescheduleTurn({
+    required String groupId,
+    required String turnId,
+    required DateTime scheduledDate,
+  }) async {
+    await _dio.patch('/groups/$groupId/turns/$turnId/reschedule', data: {
+      'scheduledDate': scheduledDate.toIso8601String(),
+    });
+  }
+
+  // ── JOURNAL D'AUDIT ────────────────────────────────────────────────────────
+
+  Future<List<Map<String, dynamic>>> getAuditLog(String groupId) async {
+    final res = await _dio.get('/groups/$groupId/audit-log');
+    final list = res.data['data'] as List;
+    return list.cast<Map<String, dynamic>>();
+  }
+
+  // ── ACTIVITÉS ──────────────────────────────────────────────────────────────
+
+  Future<List<Map<String, dynamic>>> getActivity(String groupId) async {
+    final res = await _dio.get('/groups/$groupId/activity');
+    final list = res.data['data'] as List;
+    return list.cast<Map<String, dynamic>>();
+  }
+
+  /// Supprime une activité de la liste (suppression douce — l'entrée reste
+  /// visible dans le Journal d'audit complet).
+  Future<void> dismissActivity({
+    required String groupId,
+    required String activityId,
+  }) async {
+    await _dio.delete('/groups/$groupId/activity/$activityId');
   }
 
   // ── VUE MEMBRE ────────────────────────────────────────────────────────────
@@ -172,5 +230,14 @@ class GroupService {
     final res = await _dio.get('/groups/$groupId/member/contributions');
     final list = res.data['data'] as List;
     return list.map((j) => Contribution.fromJson(j)).toList();
+  }
+
+  /// Retire une cotisation de l'historique personnel du membre (suppression
+  /// douce — reste intacte et comptée côté gérant).
+  Future<void> hideMemberContribution({
+    required String groupId,
+    required String contributionId,
+  }) async {
+    await _dio.delete('/groups/$groupId/member/contributions/$contributionId');
   }
 }

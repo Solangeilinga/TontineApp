@@ -15,9 +15,11 @@ import '../screens/gerant/gerant_home_screen.dart';
 import '../screens/gerant/create_group_screen.dart';
 import '../screens/gerant/edit_group_screen.dart';
 import '../screens/gerant/group_detail_screen.dart';
+import '../screens/gerant/audit_log_screen.dart';
 import '../screens/membre/membre_home_screen.dart';
 import '../screens/membre/membre_group_detail_screen.dart';
 import '../screens/membre/membre_notifications_screen.dart';
+import '../screens/legal/terms_screen.dart';
 
 class AppRouter {
   static final _apiService = ApiService();
@@ -132,6 +134,12 @@ class AppRouter {
           groupId: state.pathParameters['id']!,
         ),
       ),
+      GoRoute(
+        path: '/gerant/groups/:id/audit-log',
+        builder: (_, state) => AuditLogScreen(
+          groupId: state.pathParameters['id']!,
+        ),
+      ),
 
       // ── Membre
       GoRoute(
@@ -147,6 +155,10 @@ class AppRouter {
       GoRoute(
         path: '/membre/notifications',
         builder: (_, __) => const MembreNotificationsScreen(),
+      ),
+      GoRoute(
+        path: '/legal/terms',
+        builder: (_, __) => const TermsScreen(),
       ),
     ],
   );

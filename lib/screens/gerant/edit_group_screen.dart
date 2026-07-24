@@ -46,7 +46,8 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
         _amountCtrl.text = group.amount.toStringAsFixed(0);
         _currency = group.currency;
         _maxMembersCtrl.text = group.maxMembers?.toString() ?? '';
-        // Parser la description pour retrouver la fréquence
+        _frequencyValueCtrl.text = group.frequencyValue.toString();
+        _frequencyUnit = group.frequencyUnit;
         _descCtrl.text = group.description ?? '';
         _loadingData = false;
       });
@@ -71,18 +72,17 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
     if (!_formKey.currentState!.validate()) return;
     setState(() { _loading = true; _errorMsg = ''; });
 
-    final freqDetail = _frequencyLabel;
     final userDesc = _descCtrl.text.trim();
-    final description = userDesc.isEmpty ? freqDetail : '$userDesc • $freqDetail';
 
     try {
       await _groupService.updateGroup(
         id: widget.groupId,
         name: _nameCtrl.text.trim(),
-        frequency: 'OTHER',
+        frequencyValue: int.parse(_frequencyValueCtrl.text.trim()),
+        frequencyUnit: _frequencyUnit,
         amount: double.parse(_amountCtrl.text.trim()),
         currency: _currency,
-        description: description,
+        description: userDesc.isEmpty ? null : userDesc,
         maxMembers: _maxMembersCtrl.text.trim().isEmpty
             ? null
             : int.parse(_maxMembersCtrl.text.trim()),

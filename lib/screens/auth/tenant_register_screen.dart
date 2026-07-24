@@ -1,5 +1,6 @@
 // lib/screens/auth/tenant_register_screen.dart
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import '../../config/app_theme.dart';
@@ -25,6 +26,7 @@ class _TenantRegisterScreenState extends State<TenantRegisterScreen> {
 
   bool _otpSent = false;
   bool _loading = false;
+  bool _acceptedTerms = false;
   String _otp = '';
   String _errorMsg = '';
   int _resendCountdown = 0;
@@ -34,6 +36,12 @@ class _TenantRegisterScreenState extends State<TenantRegisterScreen> {
 
   Future<void> _requestOTP() async {
     if (!_formKey.currentState!.validate()) return;
+    if (!_acceptedTerms) {
+      setState(() {
+        _errorMsg = "Veuillez accepter les conditions d'utilisation pour continuer";
+      });
+      return;
+    }
     setState(() { _loading = true; _errorMsg = ''; });
     try {
       await _authService.tenantRequestOTP(
@@ -191,6 +199,41 @@ class _TenantRegisterScreenState extends State<TenantRegisterScreen> {
                   ],
                 ),
                 const SizedBox(height: AppSpacing.xl),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Checkbox(
+                      value: _acceptedTerms,
+                      onChanged: (v) =>
+                          setState(() => _acceptedTerms = v ?? false),
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 14),
+                        child: RichText(
+                          text: TextSpan(
+                            style: AppTextStyles.caption,
+                            children: [
+                              const TextSpan(text: "J'ai lu et j'accepte les "),
+                              TextSpan(
+                                text: "conditions d'utilisation",
+                                style: const TextStyle(
+                                  color: AppColors.primary,
+                                  fontWeight: FontWeight.w600,
+                                  decoration: TextDecoration.underline,
+                                ),
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = () => context.push('/legal/terms'),
+                              ),
+                              const TextSpan(text: '.'),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.md),
                 if (_errorMsg.isNotEmpty) _errorBanner(),
                 AppButton(
                   label: 'Recevoir le code SMS',

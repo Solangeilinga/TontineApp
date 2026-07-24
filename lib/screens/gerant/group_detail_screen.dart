@@ -45,13 +45,15 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
   }
 
   Future<void> _loadDetail() async {
+    if (!mounted) return;
     setState(() { _loading = true; });
     try {
       final detail = await _groupService.getGroupDetail(widget.groupId);
+      if (!mounted) return;
       setState(() { _detail = detail; });
     } catch (_) {
     } finally {
-      setState(() { _loading = false; });
+      if (mounted) setState(() { _loading = false; });
     }
   }
 
@@ -237,6 +239,14 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
                   Text('Modifier'),
                 ]),
               ),
+              const PopupMenuItem(
+                value: 'audit_log',
+                child: Row(children: [
+                  Icon(Icons.history, size: 18),
+                  SizedBox(width: 8),
+                  Text("Journal d'audit"),
+                ]),
+              ),
               if (group.isActive)
                 const PopupMenuItem(
                   value: 'archive',
@@ -258,6 +268,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
             ],
             onSelected: (v) {
               if (v == 'edit') context.go('/gerant/groups/${widget.groupId}/edit');
+              if (v == 'audit_log') context.push('/gerant/groups/${widget.groupId}/audit-log');
               if (v == 'archive') _archiveGroup();
               if (v == 'unarchive') _unarchiveGroup();
             },
@@ -335,16 +346,21 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
                       const SizedBox(height: 8),
                       Row(
                         children: [
-                          Text(
-                            group.inviteCode,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.primary,
-                              fontSize: 22,
-                              letterSpacing: 4,
+                          Expanded(
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                group.inviteCode,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.primary,
+                                  fontSize: 22,
+                                  letterSpacing: 4,
+                                ),
+                              ),
                             ),
                           ),
-                          const Spacer(),
                           IconButton(
                             icon: const Icon(Icons.copy_outlined, size: 20),
                             color: AppColors.primary,
@@ -428,10 +444,12 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
                 _TurnsTab(
                   groupId: widget.groupId,
                   apiService: _apiService,
+                  groupService: _groupService,
                 ),
                 _ActivityTab(
                   groupId: widget.groupId,
                   apiService: _apiService,
+                  groupService: _groupService,
                 ),
               ],
             ),
@@ -875,16 +893,18 @@ class _ContributionsTabState extends State<_ContributionsTab> {
   }
 
   Future<void> _load() async {
+    if (!mounted) return;
     setState(() { _loading = true; });
     try {
       final list =
           await widget.groupService.getContributions(widget.groupId);
       final recap =
           await widget.groupService.getCycleRecap(widget.groupId);
+      if (!mounted) return;
       setState(() { _contribs = list; _recap = recap; });
     } catch (_) {
     } finally {
-      setState(() { _loading = false; });
+      if (mounted) setState(() { _loading = false; });
     }
   }
 
@@ -926,7 +946,7 @@ class _ContributionsTabState extends State<_ContributionsTab> {
             const Text('Aucune cotisation', style: AppTextStyles.h4),
             const SizedBox(height: AppSpacing.sm),
             const Text(
-              'Creez un cycle de cotisations pour commencer',
+              'Démarrez un cycle pour générer automatiquement le calendrier des tours et des cotisations.',
               style: AppTextStyles.caption,
               textAlign: TextAlign.center,
             ),
@@ -934,9 +954,9 @@ class _ContributionsTabState extends State<_ContributionsTab> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
               child: AppButton(
-                label: 'Creer un cycle',
-                onPressed: () => _showCreateCycleSheet(context),
-                icon: Icons.add,
+                label: 'Démarrer un cycle',
+                onPressed: () => _showStartCycleSheet(context),
+                icon: Icons.play_circle_outline,
               ),
             ),
           ],
@@ -953,9 +973,9 @@ class _ContributionsTabState extends State<_ContributionsTab> {
             children: [
               Expanded(
                 child: AppButton(
-                  label: 'Nouveau cycle',
-                  onPressed: () => _showCreateCycleSheet(context),
-                  icon: Icons.add,
+                  label: 'Démarrer un cycle',
+                  onPressed: () => _showStartCycleSheet(context),
+                  icon: Icons.play_circle_outline,
                 ),
               ),
               if (_recap != null) ...[
@@ -999,7 +1019,12 @@ class _ContributionsTabState extends State<_ContributionsTab> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Recapitulatif', style: AppTextStyles.h4),
+                  Text(
+                    _recap!['cycleNumber'] != null
+                        ? 'Recapitulatif — Cycle N°${_recap!['cycleNumber']}'
+                        : 'Recapitulatif',
+                    style: AppTextStyles.h4,
+                  ),
                   const SizedBox(height: AppSpacing.md),
                   Row(
                     children: [
@@ -1079,13 +1104,17 @@ class _ContributionsTabState extends State<_ContributionsTab> {
                 decoration: BoxDecoration(
                   color: AppColors.surface,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.border),
+                  border: Border.all(
+                    color: c.isLate
+                        ? AppColors.error.withOpacity(0.3)
+                        : AppColors.border,
+                  ),
                 ),
                 child: ListTile(
                   title: Text(c.user?.name ?? '',
                       style: AppTextStyles.bodyMedium),
                   subtitle: Text(
-                    'Echeance : ${Formatters.date(c.dueDate)}',
+                    'Tour N°${c.roundNumber} — Echeance : ${Formatters.date(c.dueDate)}',
                     style: AppTextStyles.caption,
                   ),
                   trailing: Row(
@@ -1095,15 +1124,16 @@ class _ContributionsTabState extends State<_ContributionsTab> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
-                          color: _statusColor(c.status).withOpacity(0.1),
+                          color: (c.isLate ? AppColors.error : _statusColor(c.status))
+                              .withOpacity(0.1),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
-                          c.statusLabel,
+                          c.isLate && c.isPending ? 'En retard' : c.statusLabel,
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
-                            color: _statusColor(c.status),
+                            color: c.isLate ? AppColors.error : _statusColor(c.status),
                           ),
                         ),
                       ),
@@ -1145,8 +1175,8 @@ class _ContributionsTabState extends State<_ContributionsTab> {
     );
   }
 
-  void _showCreateCycleSheet(BuildContext context) {
-    DateTime selected = DateTime.now().add(const Duration(days: 7));
+  void _showStartCycleSheet(BuildContext context) {
+    DateTime selected = DateTime.now();
     bool loading = false;
 
     showModalBottomSheet(
@@ -1165,11 +1195,12 @@ class _ContributionsTabState extends State<_ContributionsTab> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Nouveau cycle de cotisations',
-                  style: AppTextStyles.h3),
+              const Text('Démarrer un cycle', style: AppTextStyles.h3),
               const SizedBox(height: AppSpacing.sm),
               const Text(
-                'Une cotisation sera creee pour chaque membre du groupe.',
+                'Le premier membre recevra sa mise le jour du début. Le calendrier '
+                'complet des tours et des cotisations sera généré automatiquement '
+                'selon la fréquence du groupe.',
                 style: AppTextStyles.caption,
               ),
               const SizedBox(height: AppSpacing.md),
@@ -1180,7 +1211,7 @@ class _ContributionsTabState extends State<_ContributionsTab> {
                 ),
                 leading: const Icon(Icons.calendar_today,
                     color: AppColors.primary),
-                title: const Text('Date d\'echeance'),
+                title: const Text('Date de début'),
                 subtitle: Text(
                   Formatters.date(selected),
                   style: const TextStyle(
@@ -1192,7 +1223,7 @@ class _ContributionsTabState extends State<_ContributionsTab> {
                   final picked = await showDatePicker(
                     context: ctx,
                     initialDate: selected,
-                    firstDate: DateTime.now(),
+                    firstDate: DateTime.now().subtract(const Duration(days: 30)),
                     lastDate: DateTime.now().add(const Duration(days: 365)),
                   );
                   if (picked != null) setModalState(() => selected = picked);
@@ -1200,21 +1231,21 @@ class _ContributionsTabState extends State<_ContributionsTab> {
               ),
               const SizedBox(height: AppSpacing.lg),
               AppButton(
-                label: 'Creer les cotisations',
+                label: 'Démarrer le cycle',
                 isLoading: loading,
                 onPressed: () async {
                   setModalState(() => loading = true);
                   try {
-                    await widget.groupService.createCycle(
+                    await widget.groupService.startCycle(
                       groupId: widget.groupId,
-                      dueDate: selected,
+                      startDate: selected,
                     );
                     if (mounted) {
                       Navigator.pop(ctx);
                       _load();
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('Cotisations creees avec succes !'),
+                          content: Text('Cycle démarré avec succès !'),
                           backgroundColor: AppColors.success,
                         ),
                       );
@@ -1244,8 +1275,13 @@ class _ContributionsTabState extends State<_ContributionsTab> {
 class _TurnsTab extends StatefulWidget {
   final String groupId;
   final ApiService apiService;
+  final GroupService groupService;
 
-  const _TurnsTab({required this.groupId, required this.apiService});
+  const _TurnsTab({
+    required this.groupId,
+    required this.apiService,
+    required this.groupService,
+  });
 
   @override
   State<_TurnsTab> createState() => _TurnsTabState();
@@ -1263,10 +1299,12 @@ class _TurnsTabState extends State<_TurnsTab> {
   }
 
   Future<void> _load() async {
+    if (!mounted) return;
     setState(() { _loading = true; _error = null; });
     try {
       final res = await widget.apiService.dio
           .get('/groups/${widget.groupId}/turns');
+      if (!mounted) return;
       final data = res.data['data'];
       if (data != null) {
         setState(() { _data = data; });
@@ -1274,28 +1312,27 @@ class _TurnsTabState extends State<_TurnsTab> {
         setState(() { _error = 'Aucune donnée reçue'; });
       }
     } catch (e) {
+      if (!mounted) return;
       setState(() { _error = 'Erreur de chargement'; });
     } finally {
-      setState(() { _loading = false; });
+      if (mounted) {
+        setState(() { _loading = false; });
+      }
     }
   }
 
-  Future<void> _markReceived(
-      Map<String, dynamic> member, int turnNumber) async {
+  Future<void> _markReceived(Map<String, dynamic> turn) async {
     try {
       await widget.apiService.dio.post(
         '/groups/${widget.groupId}/turns/received',
-        data: {
-          'userId': member['userId'],
-          'turnNumber': turnNumber,
-        },
+        data: { 'turnNumber': turn['turnNumber'] },
       );
       _load();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-                '${member['user']['name']} a recu sa mise !'),
+                '${turn['user']['name']} a recu sa mise !'),
             backgroundColor: AppColors.success,
           ),
         );
@@ -1312,13 +1349,102 @@ class _TurnsTabState extends State<_TurnsTab> {
     }
   }
 
-  void _showConfirmDialog(Map<String, dynamic> member, int turnNumber) {
+  Future<void> _rescheduleTurn(Map<String, dynamic> turn) async {
+    final current = DateTime.parse(turn['scheduledDate']);
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: current,
+      firstDate: DateTime.now().subtract(const Duration(days: 365)),
+      lastDate: DateTime.now().add(const Duration(days: 730)),
+    );
+    if (picked == null) return;
+
+    try {
+      await widget.groupService.rescheduleTurn(
+        groupId: widget.groupId,
+        turnId: turn['id'],
+        scheduledDate: picked,
+      );
+      _load();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Date du tour mise à jour'),
+            backgroundColor: AppColors.success,
+          ),
+        );
+      }
+    } catch (e) {
+      String msg = 'Erreur. Reessayez.';
+      try {
+        msg = (e as dynamic).response?.data?['message'] ?? msg;
+      } catch (_) {}
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(msg)));
+      }
+    }
+  }
+
+  Future<void> _closeCycle(int cycleNumber, bool allReceived) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Clôturer le cycle ?'),
+        content: Text(
+          allReceived
+              ? 'Tous les membres ont reçu leur mise pour le Cycle N°$cycleNumber. '
+                'Le clôturer permettra de démarrer un nouveau cycle (Cycle N°${cycleNumber + 1}).'
+              : 'Certains membres n\'ont pas encore reçu leur mise pour le Cycle N°$cycleNumber. '
+                'Clôturer maintenant démarrera un nouveau cycle sans attendre les membres restants. '
+                'Voulez-vous continuer ?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Annuler'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.accent),
+            child: const Text('Clôturer'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+
+    try {
+      await widget.groupService.closeCycle(widget.groupId);
+      _load();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Cycle N°$cycleNumber clôturé. Cycle N°${cycleNumber + 1} démarré.'),
+            backgroundColor: AppColors.success,
+          ),
+        );
+      }
+    } catch (e) {
+      String msg = 'Erreur. Reessayez.';
+      try {
+        msg = (e as dynamic).response?.data?['message'] ?? msg;
+      } catch (_) {}
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(msg)));
+      }
+    }
+  }
+
+  void _showConfirmDialog(Map<String, dynamic> turn) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Confirmer la remise'),
         content: Text(
-          '${member['user']['name']} a bien recu la mise du tour N°$turnNumber ?',
+          '${turn['user']['name']} a bien recu la mise du tour N°${turn['turnNumber']} ?',
         ),
         actions: [
           TextButton(
@@ -1328,7 +1454,7 @@ class _TurnsTabState extends State<_TurnsTab> {
           ElevatedButton(
             onPressed: () {
               Navigator.pop(ctx);
-              _markReceived(member, turnNumber);
+              _markReceived(turn);
             },
             style:
                 ElevatedButton.styleFrom(backgroundColor: AppColors.accent),
@@ -1369,22 +1495,42 @@ class _TurnsTabState extends State<_TurnsTab> {
     }
 
     // Null safety — cast sécurisé
-    final turns = (_data?['turns'] as List?) ?? [];
-    final pendingMembers = (_data?['pendingMembers'] as List?) ?? [];
+    final turns = ((_data?['turns'] as List?) ?? [])
+        .cast<Map<String, dynamic>>();
     final receivedCount = (_data?['receivedCount'] as int?) ?? 0;
     final totalMembers = (_data?['totalMembers'] as int?) ?? 0;
+    final cycleNumber = _data?['cycleNumber'] as int?;
+    final cycleStartDate = _data?['cycleStartDate'] != null
+        ? DateTime.parse(_data!['cycleStartDate'])
+        : null;
+    final cycleDueDate = _data?['cycleDueDate'] != null
+        ? DateTime.parse(_data!['cycleDueDate'])
+        : null;
+    final allReceived = (_data?['allReceived'] as bool?) ?? false;
 
-    if (totalMembers == 0) {
-      return const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.people_outline,
-                size: 56, color: AppColors.textHint),
-            SizedBox(height: AppSpacing.md),
-            Text('Aucun membre dans ce groupe',
-                style: AppTextStyles.h4),
-          ],
+    final pendingTurns = turns.where((t) => t['status'] != 'DONE').toList();
+    final doneTurns = turns.where((t) => t['status'] == 'DONE').toList();
+
+    if (cycleNumber == null) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.calendar_today_outlined,
+                  size: 56, color: AppColors.textHint),
+              const SizedBox(height: AppSpacing.md),
+              const Text('Aucun cycle en cours', style: AppTextStyles.h4),
+              const SizedBox(height: AppSpacing.sm),
+              const Text(
+                "Démarrez un cycle depuis l'onglet Cotisations pour générer "
+                "le calendrier des tours.",
+                style: AppTextStyles.caption,
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
         ),
       );
     }
@@ -1394,6 +1540,79 @@ class _TurnsTabState extends State<_TurnsTab> {
       child: ListView(
         padding: const EdgeInsets.all(AppSpacing.md),
         children: [
+          // ── En-tête du cycle
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Cycle N°$cycleNumber', style: AppTextStyles.h3),
+              if (allReceived)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppColors.success.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: const Text(
+                    'Complet',
+                    style: TextStyle(
+                      color: AppColors.success,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          if (cycleStartDate != null && cycleDueDate != null) ...[
+            const SizedBox(height: 2),
+            Text(
+              'Du ${Formatters.date(cycleStartDate)} au ${Formatters.date(cycleDueDate)}',
+              style: AppTextStyles.caption,
+            ),
+          ],
+          const SizedBox(height: AppSpacing.sm),
+
+          // ── Clôturer le cycle
+          if (allReceived) ...[
+            Container(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              decoration: BoxDecoration(
+                color: AppColors.accent.withOpacity(0.08),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: AppColors.accent.withOpacity(0.25)),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.workspace_premium_outlined,
+                      color: AppColors.accent, size: 22),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      'Tous les membres ont reçu leur mise pour ce cycle.',
+                      style: AppTextStyles.bodyMedium,
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () => _closeCycle(cycleNumber, allReceived),
+                    child: const Text('Clôturer'),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: AppSpacing.md),
+          ] else if (totalMembers > 0) ...[
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton.icon(
+                onPressed: () => _closeCycle(cycleNumber, allReceived),
+                icon: const Icon(Icons.stop_circle_outlined, size: 18),
+                label: const Text('Clôturer le cycle maintenant'),
+              ),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+          ],
+
           // Résumé
           Container(
             padding: const EdgeInsets.all(AppSpacing.md),
@@ -1434,96 +1653,142 @@ class _TurnsTabState extends State<_TurnsTab> {
           const SizedBox(height: AppSpacing.md),
 
           // En attente de recevoir
-          if (pendingMembers.isNotEmpty) ...[
+          if (pendingTurns.isNotEmpty) ...[
             Row(
               children: [
                 const Icon(Icons.hourglass_empty,
                     color: AppColors.warning, size: 18),
                 const SizedBox(width: 6),
-                const Text('En attente de recevoir',
+                const Text('Calendrier des tours',
                     style: AppTextStyles.h3),
               ],
             ),
             const SizedBox(height: AppSpacing.sm),
-            ...pendingMembers.asMap().entries.map((entry) {
+            ...pendingTurns.asMap().entries.map((entry) {
               final i = entry.key;
-              final m = entry.value as Map<String, dynamic>;
-              final turnNumber = receivedCount + i + 1;
+              final t = entry.value;
               final isNext = i == 0;
+              final isLate = t['isLate'] == true;
+              final scheduledDate = DateTime.parse(t['scheduledDate']);
 
               return Container(
                 margin: const EdgeInsets.only(bottom: 8),
                 decoration: BoxDecoration(
-                  color: isNext
-                      ? AppColors.accent.withOpacity(0.06)
-                      : AppColors.surface,
+                  color: isLate
+                      ? AppColors.error.withOpacity(0.05)
+                      : isNext
+                          ? AppColors.accent.withOpacity(0.06)
+                          : AppColors.surface,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: isNext
-                        ? AppColors.accent.withOpacity(0.3)
-                        : AppColors.border,
+                    color: isLate
+                        ? AppColors.error.withOpacity(0.3)
+                        : isNext
+                            ? AppColors.accent.withOpacity(0.3)
+                            : AppColors.border,
                   ),
                 ),
                 child: ListTile(
                   leading: CircleAvatar(
-                    backgroundColor: isNext
-                        ? AppColors.accent.withOpacity(0.15)
-                        : AppColors.surfaceAlt,
+                    backgroundColor: isLate
+                        ? AppColors.error.withOpacity(0.15)
+                        : isNext
+                            ? AppColors.accent.withOpacity(0.15)
+                            : AppColors.surfaceAlt,
                     child: Text(
-                      '$turnNumber',
+                      '${t['turnNumber']}',
                       style: TextStyle(
                         fontWeight: FontWeight.w700,
-                        color: isNext
-                            ? AppColors.accent
-                            : AppColors.textSecondary,
+                        color: isLate
+                            ? AppColors.error
+                            : isNext
+                                ? AppColors.accent
+                                : AppColors.textSecondary,
                       ),
                     ),
                   ),
                   title: Text(
-                    (m['user'] as Map<String, dynamic>?)?['name'] ?? '',
+                    (t['user'] as Map<String, dynamic>?)?['name'] ?? '',
                     style: TextStyle(
                       fontWeight:
                           isNext ? FontWeight.w700 : FontWeight.w500,
                     ),
                   ),
-                  subtitle: Text(
-                    isNext ? 'Prochain a recevoir' : 'Tour N°$turnNumber',
-                    style: TextStyle(
-                      color: isNext
-                          ? AppColors.accent
-                          : AppColors.textHint,
-                      fontSize: 12,
-                      fontWeight: isNext
-                          ? FontWeight.w600
-                          : FontWeight.w400,
-                    ),
+                  subtitle: Row(
+                    children: [
+                      Flexible(
+                        child: Text(
+                          Formatters.date(scheduledDate),
+                          style: TextStyle(
+                            color: isLate
+                                ? AppColors.error
+                                : isNext
+                                    ? AppColors.accent
+                                    : AppColors.textHint,
+                            fontSize: 12,
+                            fontWeight: isNext || isLate
+                                ? FontWeight.w600
+                                : FontWeight.w400,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      if (isLate) ...[
+                        const SizedBox(width: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 1),
+                          decoration: BoxDecoration(
+                            color: AppColors.error.withOpacity(0.12),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: const Text(
+                            'En retard',
+                            style: TextStyle(
+                              color: AppColors.error,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
-                  trailing: isNext
-    ? ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 100),
-        child: ElevatedButton(
-          onPressed: () =>
-              _showConfirmDialog(m, turnNumber),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.accent,
-            foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(
-                horizontal: 8, vertical: 8),
-            minimumSize: Size.zero,
-            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            textStyle: const TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          child: const Text(
-            'Marquer reçu',
-            overflow: TextOverflow.ellipsis,
-            maxLines: 1,
-          ),
-        ),
-      )
-    : null,
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.edit_calendar_outlined, size: 20),
+                        color: AppColors.textSecondary,
+                        onPressed: () => _rescheduleTurn(t),
+                        tooltip: 'Modifier la date',
+                      ),
+                      if (isNext)
+                        ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 100),
+                          child: ElevatedButton(
+                            onPressed: () => _showConfirmDialog(t),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.accent,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 8),
+                              minimumSize: Size.zero,
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              textStyle: const TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            child: const Text(
+                              'Marquer reçu',
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
               );
             }),
@@ -1531,7 +1796,7 @@ class _TurnsTabState extends State<_TurnsTab> {
           ],
 
           // Ont deja recu
-          if (turns.isNotEmpty) ...[
+          if (doneTurns.isNotEmpty) ...[
             Row(
               children: [
                 const Icon(Icons.check_circle,
@@ -1541,10 +1806,7 @@ class _TurnsTabState extends State<_TurnsTab> {
               ],
             ),
             const SizedBox(height: AppSpacing.sm),
-            ...turns
-                .where((t) => (t as Map<String, dynamic>)['status'] == 'DONE')
-                .map((t) {
-              final turn = t as Map<String, dynamic>;
+            ...doneTurns.map((turn) {
               return Container(
                 margin: const EdgeInsets.only(bottom: 8),
                 padding: const EdgeInsets.all(AppSpacing.md),
@@ -1568,7 +1830,7 @@ class _TurnsTabState extends State<_TurnsTab> {
                             style: AppTextStyles.bodyMedium,
                           ),
                           Text(
-                            'Tour N°${turn['turnNumber']}',
+                            'Tour N°${turn['turnNumber']} — ${Formatters.date(DateTime.parse(turn['scheduledDate']))}',
                             style: AppTextStyles.caption,
                           ),
                         ],
@@ -1605,8 +1867,13 @@ class _TurnsTabState extends State<_TurnsTab> {
 class _ActivityTab extends StatefulWidget {
   final String groupId;
   final ApiService apiService;
+  final GroupService groupService;
 
-  const _ActivityTab({required this.groupId, required this.apiService});
+  const _ActivityTab({
+    required this.groupId,
+    required this.apiService,
+    required this.groupService,
+  });
 
   @override
   State<_ActivityTab> createState() => _ActivityTabState();
@@ -1623,17 +1890,19 @@ class _ActivityTabState extends State<_ActivityTab> {
   }
 
   Future<void> _load() async {
+    if (!mounted) return;
     setState(() { _loading = true; });
     try {
       final res = await widget.apiService.dio
           .get('/groups/${widget.groupId}/activity');
+      if (!mounted) return;
       setState(() {
         _activities = (res.data['data'] as List?) ?? [];
       });
     } catch (_) {
-      setState(() { _activities = []; });
+      if (mounted) setState(() { _activities = []; });
     } finally {
-      setState(() { _loading = false; });
+      if (mounted) setState(() { _loading = false; });
     }
   }
 
@@ -1645,6 +1914,26 @@ class _ActivityTabState extends State<_ActivityTab> {
     if (diff.inHours < 24) return 'il y a ${diff.inHours}h';
     if (diff.inDays < 7) return 'il y a ${diff.inDays}j';
     return '${date.day}/${date.month}/${date.year}';
+  }
+
+  Future<void> _dismiss(Map<String, dynamic> activity, int index) async {
+    // ── Suppression optimiste côté UI
+    setState(() { _activities.removeAt(index); });
+
+    try {
+      await widget.groupService.dismissActivity(
+        groupId: widget.groupId,
+        activityId: activity['id'],
+      );
+    } catch (_) {
+      // ── En cas d'échec, on la remet dans la liste
+      if (mounted) {
+        setState(() { _activities.insert(index, activity); });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Erreur, réessayez.')),
+        );
+      }
+    }
   }
 
   @override
@@ -1683,32 +1972,47 @@ class _ActivityTabState extends State<_ActivityTab> {
         itemCount: _activities.length,
         itemBuilder: (ctx, i) {
           final a = _activities[i] as Map<String, dynamic>;
-          return Container(
-            margin: const EdgeInsets.only(bottom: 8),
-            padding: const EdgeInsets.all(AppSpacing.md),
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.border),
+          return Dismissible(
+            key: ValueKey(a['id']),
+            direction: DismissDirection.endToStart,
+            onDismissed: (_) => _dismiss(a, i),
+            background: Container(
+              margin: const EdgeInsets.only(bottom: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              alignment: Alignment.centerRight,
+              decoration: BoxDecoration(
+                color: AppColors.error.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(Icons.delete_outline, color: AppColors.error),
             ),
-            child: Row(
-              children: [
-                _ActivityIcon(type: a['type'] as String? ?? 'GENERAL'),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(a['text'] as String? ?? '',
-                          style: AppTextStyles.bodyMedium),
-                      Text(
-                        _timeAgo(a['date'] as String),
-                        style: AppTextStyles.caption,
-                      ),
-                    ],
+            child: Container(
+              margin: const EdgeInsets.only(bottom: 8),
+              padding: const EdgeInsets.all(AppSpacing.md),
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppColors.border),
+              ),
+              child: Row(
+                children: [
+                  _ActivityIcon(type: a['type'] as String? ?? 'GENERAL'),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(a['text'] as String? ?? '',
+                            style: AppTextStyles.bodyMedium),
+                        Text(
+                          _timeAgo(a['date'] as String),
+                          style: AppTextStyles.caption,
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           );
         },

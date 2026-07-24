@@ -22,22 +22,36 @@ class _MembreHomeScreenState extends State<MembreHomeScreen> {
   List<Group> _groups = [];
   bool _loading = true;
   String? _error;
+  int _unreadCount = 0;
 
   @override
   void initState() {
     super.initState();
     _load();
+    _loadUnreadCount();
   }
 
   Future<void> _load() async {
     setState(() { _loading = true; _error = null; });
     try {
       final groups = await _groupService.getMemberGroups();
+      if (!mounted) return;
       setState(() { _groups = groups; });
     } catch (e) {
+      if (!mounted) return;
       setState(() { _error = 'Erreur de chargement'; });
     } finally {
-      setState(() { _loading = false; });
+      if (mounted) setState(() { _loading = false; });
+    }
+  }
+
+  Future<void> _loadUnreadCount() async {
+    try {
+      final res = await _apiService.dio.get('/notifications/unread-count');
+      if (!mounted) return;
+      setState(() { _unreadCount = res.data['data']['count'] ?? 0; });
+    } catch (_) {
+      // silencieux — le badge reste simplement à 0 en cas d'erreur réseau
     }
   }
 
@@ -47,7 +61,9 @@ class _MembreHomeScreenState extends State<MembreHomeScreen> {
       backgroundColor: AppColors.background,
       body: SafeArea(
         child: RefreshIndicator(
-          onRefresh: _load,
+          onRefresh: () async {
+            await Future.wait([_load(), _loadUnreadCount()]);
+          },
           color: AppColors.primary,
           child: CustomScrollView(
             slivers: [
@@ -74,12 +90,46 @@ class _MembreHomeScreenState extends State<MembreHomeScreen> {
                           ],
                         ),
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.notifications_outlined),
-                        color: AppColors.textSecondary,
-                        onPressed: () =>
-                            context.go('/membre/notifications'),
-                        tooltip: 'Notifications',
+                      Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.notifications_outlined),
+                            color: AppColors.textSecondary,
+                            onPressed: () async {
+                              await context.push('/membre/notifications');
+                              _loadUnreadCount();
+                            },
+                            tooltip: 'Notifications',
+                          ),
+                          if (_unreadCount > 0)
+                            Positioned(
+                              right: 6,
+                              top: 6,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 5, vertical: 1),
+                                constraints: const BoxConstraints(
+                                    minWidth: 16, minHeight: 16),
+                                decoration: BoxDecoration(
+                                  color: AppColors.error,
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(
+                                      color: AppColors.surface, width: 1.5),
+                                ),
+                                child: Text(
+                                  _unreadCount > 9 ? '9+' : '$_unreadCount',
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w700,
+                                    height: 1.2,
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
                       IconButton(
                         icon: const Icon(Icons.lock_outline),

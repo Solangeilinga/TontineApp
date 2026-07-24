@@ -1,5 +1,6 @@
 // lib/screens/auth/member_join_screen.dart
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import '../../config/app_theme.dart';
@@ -26,6 +27,7 @@ class _MemberJoinScreenState extends State<MemberJoinScreen> {
 
   bool _otpSent = false;
   bool _loading = false;
+  bool _acceptedTerms = false;
   String _otp = '';
   String _errorMsg = '';
   String _groupName = '';
@@ -36,6 +38,12 @@ class _MemberJoinScreenState extends State<MemberJoinScreen> {
 
   Future<void> _requestOTP() async {
     if (!_formKey.currentState!.validate()) return;
+    if (!_acceptedTerms) {
+      setState(() {
+        _errorMsg = "Veuillez accepter les conditions d'utilisation pour continuer";
+      });
+      return;
+    }
     setState(() { _loading = true; _errorMsg = ''; });
     try {
       final data = await _authService.memberJoinRequestOTP(
@@ -212,7 +220,66 @@ class _MemberJoinScreenState extends State<MemberJoinScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: AppSpacing.xl),
+                const SizedBox(height: AppSpacing.md),
+                Container(
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  decoration: BoxDecoration(
+                    color: AppColors.warning.withOpacity(0.08),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.warning.withOpacity(0.25)),
+                  ),
+                  child: const Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(Icons.info_outline, color: AppColors.warning, size: 18),
+                      SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          "MaTontine facilite le suivi de la tontine mais ne "
+                          "détient ni ne garantit l'argent des cotisations. "
+                          "Ne rejoignez un groupe qu'avec des personnes de confiance.",
+                          style: TextStyle(fontSize: 12.5),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.md),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Checkbox(
+                      value: _acceptedTerms,
+                      onChanged: (v) =>
+                          setState(() => _acceptedTerms = v ?? false),
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 14),
+                        child: RichText(
+                          text: TextSpan(
+                            style: AppTextStyles.caption,
+                            children: [
+                              const TextSpan(text: "J'ai lu et j'accepte les "),
+                              TextSpan(
+                                text: "conditions d'utilisation",
+                                style: const TextStyle(
+                                  color: AppColors.primary,
+                                  fontWeight: FontWeight.w600,
+                                  decoration: TextDecoration.underline,
+                                ),
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = () => context.push('/legal/terms'),
+                              ),
+                              const TextSpan(text: '.'),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.md),
                 if (_errorMsg.isNotEmpty) _errorBanner(),
                 AppButton(
                   label: 'Recevoir le code SMS',

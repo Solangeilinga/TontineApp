@@ -54,19 +54,17 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
     if (!_formKey.currentState!.validate()) return;
     setState(() { _loading = true; _errorMsg = ''; });
 
-    final freqDetail = _frequencyLabel;
     final userDesc = _descCtrl.text.trim();
-    final description =
-        userDesc.isEmpty ? freqDetail : '$userDesc • $freqDetail';
 
     try {
       final group = await _groupService.createGroup(
         name: _nameCtrl.text.trim(),
         type: _type,
-        frequency: 'OTHER',
+        frequencyValue: int.parse(_frequencyValueCtrl.text.trim()),
+        frequencyUnit: _frequencyUnit,
         amount: double.parse(_amountCtrl.text.trim()),
         currency: _currency,
-        description: description,
+        description: userDesc.isEmpty ? null : userDesc,
         maxMembers: _maxMembersCtrl.text.trim().isEmpty
             ? null
             : int.parse(_maxMembersCtrl.text.trim()),
@@ -354,6 +352,31 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                     ],
                   ),
                 ),
+
+              Container(
+                margin: const EdgeInsets.only(bottom: AppSpacing.md),
+                padding: const EdgeInsets.all(AppSpacing.md),
+                decoration: BoxDecoration(
+                  color: AppColors.warning.withOpacity(0.08),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppColors.warning.withOpacity(0.25)),
+                ),
+                child: const Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(Icons.info_outline, color: AppColors.warning, size: 18),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        "N'invitez que des personnes que vous connaissez et en qui "
+                        "vous avez confiance. MaTontine suit les cotisations déclarées "
+                        "mais ne détient ni ne garantit l'argent échangé entre membres.",
+                        style: TextStyle(fontSize: 12.5),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
 
               AppButton(
                 label: 'Créer le groupe',

@@ -43,6 +43,20 @@ class _MembreNotificationsScreenState
     }
   }
 
+  Future<void> _dismiss(NotificationModel n, int index) async {
+    setState(() { _notifs.removeAt(index); });
+    try {
+      await _api.dio.delete('/notifications/${n.id}');
+    } catch (_) {
+      if (mounted) {
+        setState(() { _notifs.insert(index, n); });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Erreur, réessayez.')),
+        );
+      }
+    }
+  }
+
   IconData _typeIcon(String type) {
     switch (type) {
       case 'REMINDER_J1':
@@ -111,7 +125,21 @@ class _MembreNotificationsScreenState
                         const SizedBox(height: 8),
                     itemBuilder: (ctx, i) {
                       final n = _notifs[i];
-                      return Container(
+                      return Dismissible(
+                        key: ValueKey(n.id),
+                        direction: DismissDirection.endToStart,
+                        onDismissed: (_) => _dismiss(n, i),
+                        background: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          alignment: Alignment.centerRight,
+                          decoration: BoxDecoration(
+                            color: AppColors.error.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Icon(Icons.delete_outline,
+                              color: AppColors.error),
+                        ),
+                        child: Container(
                         decoration: BoxDecoration(
                           color: n.isRead
                               ? AppColors.surface
@@ -169,6 +197,7 @@ class _MembreNotificationsScreenState
                                   ),
                                 )
                               : null,
+                        ),
                         ),
                       );
                     },

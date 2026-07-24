@@ -4,7 +4,8 @@ class Group {
   final String tenantId;
   final String name;
   final String type;
-  final String frequency;
+  final int frequencyValue;
+  final String frequencyUnit; // DAYS | WEEKS | MONTHS
   final double amount;
   final String currency;
   final String? description;
@@ -20,7 +21,8 @@ class Group {
     required this.tenantId,
     required this.name,
     required this.type,
-    required this.frequency,
+    required this.frequencyValue,
+    required this.frequencyUnit,
     required this.amount,
     required this.currency,
     this.description,
@@ -37,7 +39,8 @@ class Group {
         tenantId: json['tenantId'],
         name: json['name'],
         type: json['type'],
-        frequency: json['frequency'],
+        frequencyValue: json['frequencyValue'] ?? 1,
+        frequencyUnit: json['frequencyUnit'] ?? 'MONTHS',
         amount: (json['amount'] as num).toDouble(),
         currency: json['currency'] ?? 'XOF',
         description: json['description'],
@@ -52,15 +55,33 @@ class Group {
   // V1 — Argent uniquement
   String get typeLabel => 'Argent';
 
-  // Fréquence = description si disponible, sinon fréquence brute
-  String get frequencyLabel {
-    if (description != null && description!.isNotEmpty) {
-      return description!;
+  String get frequencyUnitLabel {
+    switch (frequencyUnit) {
+      case 'DAYS':
+        return frequencyValue == 1 ? 'jour' : 'jours';
+      case 'WEEKS':
+        return frequencyValue == 1 ? 'semaine' : 'semaines';
+      case 'MONTHS':
+      default:
+        return frequencyValue == 1 ? 'mois' : 'mois';
     }
-    switch (frequency) {
-      case 'WEEKLY': return 'Hebdomadaire';
-      case 'MONTHLY': return 'Mensuelle';
-      default: return 'Personnalisée';
+  }
+
+  // Ex: "Tous les 5 jours" / "Tous les mois"
+  String get frequencyLabel => 'Tous les $frequencyValue $frequencyUnitLabel';
+
+  // Durée en jours d'un intervalle (approximation pour les mois : 30 jours,
+  // utilisée uniquement pour des estimations d'affichage côté client — le
+  // calcul faisant foi est toujours effectué côté serveur).
+  int get frequencyDaysApprox {
+    switch (frequencyUnit) {
+      case 'DAYS':
+        return frequencyValue;
+      case 'WEEKS':
+        return frequencyValue * 7;
+      case 'MONTHS':
+      default:
+        return frequencyValue * 30;
     }
   }
 }
