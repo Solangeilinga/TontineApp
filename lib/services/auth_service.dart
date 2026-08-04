@@ -95,6 +95,20 @@ class AuthService {
     return res.data;
   }
 
+  /// À appeler quand memberLoginVerify a renvoyé `requiresSelection: true`
+  /// (le numéro est membre chez plusieurs gérants) — finalise la connexion
+  /// pour l'espace (tenantId) choisi par l'utilisateur.
+  Future<Map<String, dynamic>> memberLoginSelectSpace({
+    required String selectionToken,
+    required String tenantId,
+  }) async {
+    final res = await _dio.post('/auth/member/login/select-space', data: {
+      'selectionToken': selectionToken,
+      'tenantId': tenantId,
+    });
+    return res.data;
+  }
+
   // ── Après connexion SMS : décider où aller ────────────────────────────────
   // On vient de s'authentifier par SMS → pas de pin-login
   // Si PIN déjà défini → home directement

@@ -190,10 +190,29 @@ class GroupService {
 
   // ── JOURNAL D'AUDIT ────────────────────────────────────────────────────────
 
-  Future<List<Map<String, dynamic>>> getAuditLog(String groupId) async {
+  /// Retourne les entrées du journal, plus les infos de troncature côté
+  /// plan (voir `isTruncated`/`totalCount` — le backend limite l'historique
+  /// visible pour les plans FREE/STARTER, journal complet réservé au Pro).
+  Future<Map<String, dynamic>> getAuditLog(String groupId) async {
     final res = await _dio.get('/groups/$groupId/audit-log');
-    final list = res.data['data'] as List;
-    return list.cast<Map<String, dynamic>>();
+    final data = res.data['data'] as Map<String, dynamic>;
+    return {
+      'logs': (data['logs'] as List).cast<Map<String, dynamic>>(),
+      'isTruncated': data['isTruncated'] as bool? ?? false,
+      'totalCount': data['totalCount'] as int? ?? 0,
+    };
+  }
+
+  /// Télécharge l'export CSV des cotisations d'un groupe (fonctionnalité
+  /// réservée au plan Pro — le backend renvoie 402 sinon).
+  /// Retourne le contenu CSV brut (String) à écrire sur le disque par
+  /// l'appelant (voir subscription_screen ou group_detail_screen).
+  Future<String> exportContributionsCsv(String groupId) async {
+    final res = await _dio.get(
+      '/groups/$groupId/contributions/export',
+      options: Options(responseType: ResponseType.plain),
+    );
+    return res.data as String;
   }
 
   // ── ACTIVITÉS ──────────────────────────────────────────────────────────────

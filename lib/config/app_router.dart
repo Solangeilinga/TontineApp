@@ -12,10 +12,14 @@ import '../screens/auth/member_login_screen.dart';
 import '../screens/auth/set_pin_screen.dart';
 import '../screens/auth/pin_login_screen.dart';
 import '../screens/gerant/gerant_home_screen.dart';
+import '../screens/onboarding/onboarding_screen.dart';
 import '../screens/gerant/create_group_screen.dart';
 import '../screens/gerant/edit_group_screen.dart';
 import '../screens/gerant/group_detail_screen.dart';
 import '../screens/gerant/audit_log_screen.dart';
+import '../screens/gerant/subscription_screen.dart';
+import '../screens/gerant/tenant_profile_screen.dart';
+import '../screens/membre/member_profile_screen.dart';
 import '../screens/membre/membre_home_screen.dart';
 import '../screens/membre/membre_group_detail_screen.dart';
 import '../screens/membre/membre_notifications_screen.dart';
@@ -115,6 +119,10 @@ class AppRouter {
 
       // ── Gérant
       GoRoute(
+        path: '/gerant/onboarding',
+        builder: (_, __) => const OnboardingScreen(),
+      ),
+      GoRoute(
         path: '/gerant/home',
         builder: (_, __) => const GerantHomeScreen(),
       ),
@@ -140,6 +148,14 @@ class AppRouter {
           groupId: state.pathParameters['id']!,
         ),
       ),
+      GoRoute(
+        path: '/gerant/subscription',
+        builder: (_, __) => const SubscriptionScreen(),
+      ),
+      GoRoute(
+        path: '/gerant/profile',
+        builder: (_, __) => const TenantProfileScreen(),
+      ),
 
       // ── Membre
       GoRoute(
@@ -155,6 +171,10 @@ class AppRouter {
       GoRoute(
         path: '/membre/notifications',
         builder: (_, __) => const MembreNotificationsScreen(),
+      ),
+      GoRoute(
+        path: '/membre/profile',
+        builder: (_, __) => const MemberProfileScreen(),
       ),
       GoRoute(
         path: '/legal/terms',

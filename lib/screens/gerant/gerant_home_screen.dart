@@ -9,6 +9,7 @@ import '../../widgets/group_card.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/skeleton_loader.dart';
 import '../../widgets/app_logo.dart';
+import '../../services/onboarding_service.dart';
 
 class GerantHomeScreen extends StatefulWidget {
   const GerantHomeScreen({super.key});
@@ -29,7 +30,18 @@ class _GerantHomeScreenState extends State<GerantHomeScreen> {
   @override
   void initState() {
     super.initState();
+    _checkOnboarding();
     _load();
+  }
+
+  Future<void> _checkOnboarding() async {
+    final seen = await OnboardingService().hasSeenOnboarding();
+    if (!seen && mounted) {
+      // post-frame pour ne pas naviguer pendant le build initial
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) context.push('/gerant/onboarding');
+      });
+    }
   }
 
   Future<void> _load() async {
@@ -98,6 +110,18 @@ class _GerantHomeScreenState extends State<GerantHomeScreen> {
                                 style: AppTextStyles.caption),
                           ],
                         ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.person_outline),
+                        color: AppColors.textSecondary,
+                        onPressed: () => context.push('/gerant/profile'),
+                        tooltip: 'Mon profil',
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.workspace_premium_outlined),
+                        color: AppColors.accent,
+                        onPressed: () => context.push('/gerant/subscription'),
+                        tooltip: 'Abonnement',
                       ),
                       IconButton(
                         icon: const Icon(Icons.lock_outline),

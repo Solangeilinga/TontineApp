@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Anthracite neutre plutôt que vert sombre : le motif du logo est déjà
+         vert (#1B6B3A) — un fond vert sombre l'aurait rendu peu lisible.
+         Le splash natif s'affiche avant que Flutter n'ait chargé son propre
+         thème (actuellement clair uniquement), donc on garde ici une teinte
+         neutre cohérente pour l'instant où le système est en mode sombre. -->
+    <color name="splash_background">#16181C</color>
+</resources>

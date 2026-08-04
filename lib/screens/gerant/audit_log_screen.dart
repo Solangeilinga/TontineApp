@@ -16,6 +16,8 @@ class AuditLogScreen extends StatefulWidget {
 class _AuditLogScreenState extends State<AuditLogScreen> {
   final _groupService = GroupService();
   List<Map<String, dynamic>> _logs = [];
+  bool _isTruncated = false;
+  int _totalCount = 0;
   bool _loading = true;
   String? _error;
 
@@ -28,8 +30,12 @@ class _AuditLogScreenState extends State<AuditLogScreen> {
   Future<void> _load() async {
     setState(() { _loading = true; _error = null; });
     try {
-      final logs = await _groupService.getAuditLog(widget.groupId);
-      setState(() { _logs = logs; });
+      final result = await _groupService.getAuditLog(widget.groupId);
+      setState(() {
+        _logs = result['logs'] as List<Map<String, dynamic>>;
+        _isTruncated = result['isTruncated'] as bool;
+        _totalCount = result['totalCount'] as int;
+      });
     } catch (_) {
       setState(() { _error = 'Erreur de chargement'; });
     } finally {
@@ -150,11 +156,18 @@ class _AuditLogScreenState extends State<AuditLogScreen> {
                       onRefresh: _load,
                       child: ListView.separated(
                         padding: const EdgeInsets.all(AppSpacing.md),
-                        itemCount: _logs.length,
+                        itemCount: _logs.length + (_isTruncated ? 1 : 0),
                         separatorBuilder: (_, __) =>
                             const SizedBox(height: 8),
                         itemBuilder: (ctx, i) {
-                          final log = _logs[i];
+                          if (_isTruncated && i == 0) {
+                            return _UpsellBanner(
+                              totalCount: _totalCount,
+                              shownCount: _logs.length,
+                              onTap: () => context.push('/gerant/subscription'),
+                            );
+                          }
+                          final log = _logs[_isTruncated ? i - 1 : i];
                           final color = _colorFor(log['action'] as String);
                           final detail = _describeMetadata(log);
 
@@ -210,6 +223,51 @@ class _AuditLogScreenState extends State<AuditLogScreen> {
                         },
                       ),
                     ),
+    );
+  }
+}
+
+/// Bannière incitant à passer au plan Pro quand le journal d'audit est
+/// tronqué (plans FREE/STARTER ne voient que les entrées récentes).
+class _UpsellBanner extends StatelessWidget {
+  final int totalCount;
+  final int shownCount;
+  final VoidCallback onTap;
+
+  const _UpsellBanner({
+    required this.totalCount,
+    required this.shownCount,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        decoration: BoxDecoration(
+          color: AppColors.primary.withOpacity(0.08),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.primary.withOpacity(0.3)),
+        ),
+        child: Row(
+          children: [
+            const Icon(Icons.lock_outline, color: AppColors.primary, size: 20),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                'Vous voyez $shownCount action(s) sur $totalCount. '
+                'Passez au plan Pro pour l\'historique complet.',
+                style: AppTextStyles.bodyMedium
+                    .copyWith(color: AppColors.primary),
+              ),
+            ),
+            const Icon(Icons.chevron_right, color: AppColors.primary),
+          ],
+        ),
+      ),
     );
   }
 }

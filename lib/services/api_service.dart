@@ -21,8 +21,8 @@ class ApiService {
     // ── Dio avec token d'authentification
     dio = Dio(BaseOptions(
       baseUrl: AppConstants.baseUrl,
-      connectTimeout: const Duration(seconds: 15),
-      receiveTimeout: const Duration(seconds: 15),
+      connectTimeout: const Duration(seconds: 45),
+      receiveTimeout: const Duration(seconds: 45),
       headers: {'Content-Type': 'application/json'},
     ));
 
@@ -45,8 +45,8 @@ class ApiService {
     // ── Dio sans token — pour les endpoints PIN verrouillé
     dioNoAuth = Dio(BaseOptions(
       baseUrl: AppConstants.baseUrl,
-      connectTimeout: const Duration(seconds: 15),
-      receiveTimeout: const Duration(seconds: 15),
+      connectTimeout: const Duration(seconds: 45),
+      receiveTimeout: const Duration(seconds: 45),
       headers: {'Content-Type': 'application/json'},
     ));
   }

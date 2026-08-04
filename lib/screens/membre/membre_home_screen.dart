@@ -132,6 +132,12 @@ class _MembreHomeScreenState extends State<MembreHomeScreen> {
                         ],
                       ),
                       IconButton(
+                        icon: const Icon(Icons.person_outline),
+                        color: AppColors.textSecondary,
+                        onPressed: () => context.push('/membre/profile'),
+                        tooltip: 'Mon profil',
+                      ),
+                      IconButton(
                         icon: const Icon(Icons.lock_outline),
                         color: AppColors.textSecondary,
                         onPressed: () async {

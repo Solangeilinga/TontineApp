@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Fond crème de marque, cohérent avec le thème de l'app (AppColors.background) -->
+    <color name="splash_background">#FBF7F0</color>
+	<color name="ic_launcher_background">#FFFFFF</color>
+</resources>

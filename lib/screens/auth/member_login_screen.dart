@@ -55,21 +55,91 @@ class _MemberLoginScreenState extends State<MemberLoginScreen> {
         phone: _fullPhone,
         otp: _otp,
       );
-      await _apiService.saveTokens(
-        accessToken: data['data']['accessToken'],
-        refreshToken: data['data']['refreshToken'],
-        userType: 'user',
-      );
-      // ── Sauvegarder le numéro pour PIN verrouillé
-      await _pinService.savePhone(_fullPhone);
 
-      final route = await _authService.getPostLoginRoute('user');
-      if (mounted) context.go(route);
+      final payload = data['data'] as Map<String, dynamic>;
+
+      if (payload['requiresSelection'] == true) {
+        // Ce numéro est membre chez plusieurs gérants : demander lequel ouvrir.
+        final spaces = (payload['spaces'] as List).cast<Map<String, dynamic>>();
+        final selectionToken = payload['selectionToken'] as String;
+        if (!mounted) return;
+        final chosen = await _pickSpace(spaces);
+        if (chosen == null) {
+          setState(() { _loading = false; });
+          return;
+        }
+        final selected = await _authService.memberLoginSelectSpace(
+          selectionToken: selectionToken,
+          tenantId: chosen['tenantId'] as String,
+        );
+        await _completeLogin(selected['data']);
+        return;
+      }
+
+      await _completeLogin(payload);
     } catch (e) {
       setState(() { _errorMsg = _parseError(e); });
     } finally {
       setState(() { _loading = false; });
     }
+  }
+
+  Future<void> _completeLogin(Map<String, dynamic> payload) async {
+    await _apiService.saveTokens(
+      accessToken: payload['accessToken'],
+      refreshToken: payload['refreshToken'],
+      userType: 'user',
+    );
+    // ── Sauvegarder le numéro ET l'identifiant précis du compte pour PIN
+    // verrouillé — sans l'id, un numéro membre chez plusieurs gérants ne
+    // peut pas être désambiguïsé au déverrouillage (voir pin_service.dart).
+    await _pinService.savePhone(_fullPhone);
+    final userId = payload['user']?['id'] as String?;
+    if (userId != null) await _pinService.saveUserId(userId);
+
+    final route = await _authService.getPostLoginRoute('user');
+    if (mounted) context.go(route);
+  }
+
+  /// Affiche la liste des "espaces" (un par gérant) et retourne celui choisi,
+  /// ou null si l'utilisateur annule.
+  Future<Map<String, dynamic>?> _pickSpace(
+      List<Map<String, dynamic>> spaces) {
+    return showModalBottomSheet<Map<String, dynamic>>(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Vous avez plusieurs comptes', style: AppTextStyles.h3),
+              const SizedBox(height: 4),
+              Text(
+                'Ce numéro est membre chez plusieurs gérants. Choisissez le compte à ouvrir.',
+                style: AppTextStyles.caption,
+              ),
+              const SizedBox(height: AppSpacing.md),
+              ...spaces.map((s) => ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: const CircleAvatar(
+                      backgroundColor: AppColors.primarySurface,
+                      child: Icon(Icons.groups_outlined, color: AppColors.primary),
+                    ),
+                    title: Text(s['tenantName'] as String),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => Navigator.pop(ctx, s),
+                  )),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   void _startCountdown() {

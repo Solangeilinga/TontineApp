@@ -77,8 +77,10 @@ class _MemberJoinScreenState extends State<MemberJoinScreen> {
         refreshToken: data['data']['refreshToken'],
         userType: 'user',
       );
-      // ── Sauvegarder le numéro pour PIN verrouillé
+      // ── Sauvegarder le numéro ET l'identifiant du compte pour PIN verrouillé
       await _pinService.savePhone(_fullPhone);
+      final userId = data['data']['user']?['id'] as String?;
+      if (userId != null) await _pinService.saveUserId(userId);
 
       // ── Nouveau membre → toujours créer un PIN
       if (mounted) context.go('/set-pin/user');

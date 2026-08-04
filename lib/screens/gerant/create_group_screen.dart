@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../config/app_theme.dart';
 import '../../services/group_service.dart';
+import '../../services/subscription_service.dart';
 import '../../widgets/app_button.dart';
 
 class CreateGroupScreen extends StatefulWidget {
@@ -14,6 +15,7 @@ class CreateGroupScreen extends StatefulWidget {
 
 class _CreateGroupScreenState extends State<CreateGroupScreen> {
   final _groupService = GroupService();
+  final _subscriptionService = SubscriptionService();
   final _formKey = GlobalKey<FormState>();
   final _nameCtrl = TextEditingController();
   final _amountCtrl = TextEditingController();
@@ -26,6 +28,31 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
   String _currency = 'XOF';
   bool _loading = false;
   String _errorMsg = '';
+
+  // Limite de membres/groupe du plan actuel — null tant que non chargée, ou
+  // si le plan permet un nombre illimité. Récupérée une fois à l'ouverture
+  // pour valider immédiatement côté client (le backend reste la source de
+  // vérité et revalide de toute façon à la soumission).
+  int? _planMaxMembers;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPlanLimit();
+  }
+
+  Future<void> _loadPlanLimit() async {
+    try {
+      final sub = await _subscriptionService.getMySubscription();
+      final limit = sub.limits['maxMembersPerGroup'];
+      setState(() {
+        _planMaxMembers = limit is int ? limit : null;
+      });
+    } catch (_) {
+      // Pas grave si ça échoue — le backend validera de toute façon à la
+      // soumission, ceci n'est qu'un confort d'affichage immédiat.
+    }
+  }
 
   String get _frequencyLabel {
     final val = _frequencyValueCtrl.text.trim().isEmpty
@@ -301,17 +328,21 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
               TextFormField(
                 controller: _maxMembersCtrl,
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Nombre max de participants',
-                  prefixIcon: Icon(Icons.people_outlined),
+                  prefixIcon: const Icon(Icons.people_outlined),
                   hintText: 'Laisser vide = illimité',
-                  helperText:
-                      'Le groupe sera fermé une fois ce nombre atteint',
+                  helperText: _planMaxMembers != null
+                      ? 'Votre plan actuel autorise jusqu\'à $_planMaxMembers participants par groupe'
+                      : 'Le groupe sera fermé une fois ce nombre atteint',
                 ),
                 validator: (v) {
                   if (v == null || v.trim().isEmpty) return null;
                   final n = int.tryParse(v);
                   if (n == null || n < 2) return 'Minimum 2 participants';
+                  if (_planMaxMembers != null && n > _planMaxMembers!) {
+                    return 'Max $_planMaxMembers avec votre plan actuel — passez à un forfait supérieur pour plus';
+                  }
                   return null;
                 },
               ),

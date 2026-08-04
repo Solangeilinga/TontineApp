@@ -1,4 +1,5 @@
 // lib/screens/auth/pin_login_screen.dart
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
@@ -24,26 +25,32 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
   Future<void> _verifyPin(String pin) async {
     setState(() { _errorMsg = ''; });
 
-    // Utiliser l'endpoint verrouillé — pas besoin de token
-    final result = await _pinService.verifyPinLocked(pin, widget.userType);
+    try {
+      // Utiliser l'endpoint verrouillé — pas besoin de token
+      final result = await _pinService.verifyPinLocked(pin, widget.userType);
 
-    if (result != null) {
-      // PIN valide — sauvegarder les nouveaux tokens
-      final data = result;
-      await _apiService.saveTokens(
-        accessToken: data['accessToken'],
-        refreshToken: data['refreshToken'],
-        userType: widget.userType,
-      );
-      setState(() { _attempts = 0; });
-      if (mounted) {
-        if (widget.userType == 'tenant') {
-          context.go('/gerant/home');
-        } else {
-          context.go('/membre/home');
+      if (result != null) {
+        // PIN valide — sauvegarder les nouveaux tokens
+        final data = result;
+        await _apiService.saveTokens(
+          accessToken: data['accessToken'],
+          refreshToken: data['refreshToken'],
+          userType: widget.userType,
+        );
+        setState(() { _attempts = 0; });
+        if (mounted) {
+          if (widget.userType == 'tenant') {
+            context.go('/gerant/home');
+          } else {
+            context.go('/membre/home');
+          }
         }
+        return;
       }
-    } else {
+
+      // result == null ici signifie un VRAI code incorrect (401 backend
+      // explicite) — voir pin_service.dart pour la distinction avec les
+      // erreurs réseau/serveur, qui sont gérées dans le catch ci-dessous.
       _attempts++;
       if (_attempts >= _maxAttempts) {
         await _pinService.clearPinCache();
@@ -61,6 +68,24 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
         setState(() {
           _errorMsg =
               'Code incorrect — ${_maxAttempts - _attempts} tentative(s) restante(s)';
+        });
+      }
+    } on DioException catch (e) {
+      // Erreur réseau/serveur — NE PAS décompter une tentative, et NE PAS
+      // dire "code incorrect" : c'est trompeur si le code était en fait bon.
+      if (e.response?.statusCode == 429) {
+        setState(() {
+          _errorMsg = 'Trop de tentatives. Réessayez dans quelques minutes ou reconnectez-vous par SMS.';
+        });
+      } else if (e.type == DioExceptionType.connectionTimeout ||
+          e.type == DioExceptionType.receiveTimeout ||
+          e.type == DioExceptionType.connectionError) {
+        setState(() {
+          _errorMsg = 'Connexion au serveur impossible. Vérifiez votre réseau et réessayez.';
+        });
+      } else {
+        setState(() {
+          _errorMsg = 'Erreur serveur. Réessayez dans un instant.';
         });
       }
     }

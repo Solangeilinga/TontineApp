@@ -1,5 +1,5 @@
 class AppConstants {
-  static const String baseUrl = 'https://tontineapp-backend.onrender.com/api';
+  static const String baseUrl = 'https://tontineapp-backend-33pp.onrender.com/api';
 
   static const String accessTokenKey = 'access_token';
   static const String refreshTokenKey = 'refresh_token';
