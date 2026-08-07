@@ -1,37 +1,39 @@
 // lib/screens/gerant/gerant_home_screen.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../config/app_theme.dart';
-import '../../models/group.dart';
-import '../../services/group_service.dart';
 import '../../services/api_service.dart';
 import '../../widgets/group_card.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/skeleton_loader.dart';
 import '../../widgets/app_logo.dart';
 import '../../services/onboarding_service.dart';
+import '../../providers/groups_provider.dart';
+import '../../widgets/pwa_install_dialog.dart';
 
-class GerantHomeScreen extends StatefulWidget {
+class GerantHomeScreen extends ConsumerStatefulWidget {
   const GerantHomeScreen({super.key});
 
   @override
-  State<GerantHomeScreen> createState() => _GerantHomeScreenState();
+  ConsumerState<GerantHomeScreen> createState() => _GerantHomeScreenState();
 }
 
-class _GerantHomeScreenState extends State<GerantHomeScreen> {
-  final _groupService = GroupService();
+class _GerantHomeScreenState extends ConsumerState<GerantHomeScreen> {
   final _apiService = ApiService();
-
-  List<Group> _groups = [];
-  Map<String, dynamic>? _dashboard;
-  bool _loading = true;
-  String? _error;
 
   @override
   void initState() {
     super.initState();
     _checkOnboarding();
-    _load();
+    // Le chargement initial des groupes/dashboard se fait maintenant via
+    // `ref.watch(groupsProvider)` dans build() — plus besoin de l'appeler
+    // manuellement ici (Riverpod déclenche le fetch dès la première lecture).
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(const Duration(seconds: 2), () {
+        if (mounted) maybeShowPwaInstallReminder(context);
+      });
+    });
   }
 
   Future<void> _checkOnboarding() async {
@@ -44,33 +46,38 @@ class _GerantHomeScreenState extends State<GerantHomeScreen> {
     }
   }
 
+  /// Rappelé par le pull-to-refresh (RefreshIndicator) et par le bouton
+  /// "Réessayer". `ref.invalidate` marque les providers comme périmés — le
+  /// prochain `ref.watch` (dans build(), immédiatement après) déclenche un
+  /// nouveau fetch. `await ref.read(groupsProvider.future)` permet à
+  /// RefreshIndicator de savoir quand arrêter son spinner.
   Future<void> _load() async {
-    setState(() { _loading = true; _error = null; });
-    try {
-      final groups = await _groupService.getGroups();
-      Map<String, dynamic>? dashboard;
-      try {
-        final res = await _apiService.dio.get('/groups/dashboard/summary');
-        dashboard = res.data['data'];
-      } catch (_) {}
-      setState(() { _groups = groups; _dashboard = dashboard; });
-    } catch (e) {
-      setState(() { _error = 'Erreur de chargement'; });
-    } finally {
-      setState(() { _loading = false; });
-    }
+    ref.invalidate(groupsProvider);
+    ref.invalidate(dashboardProvider);
+    await ref.read(groupsProvider.future);
   }
 
   Future<void> _lockAndExit() async {
     await _apiService.lockSession();
-    if (mounted) context.go('/pin-login/tenant');
+    if (!mounted) return;
+    context.go('/pin-login/tenant');
   }
 
   @override
   Widget build(BuildContext context) {
-    final activeGroups = _groups.where((g) => g.isActive).length;
-    final alerts = _dashboard?['alerts'] as List? ?? [];
-    final upcomingDue = _dashboard?['upcomingDue'] as List? ?? [];
+    final groupsAsync = ref.watch(groupsProvider);
+    final dashboardAsync = ref.watch(dashboardProvider);
+
+    // Valeurs dérivées des AsyncValue, nommées comme l'ancien code
+    // (_groups/_loading/_error/_dashboard) pour garder EXACTEMENT la même
+    // logique d'affichage en dessous — seule la source de la donnée change.
+    final groups = groupsAsync.value ?? const [];
+    final loading = groupsAsync.isLoading && !groupsAsync.hasValue;
+    final error = groupsAsync.hasError ? 'Erreur de chargement' : null;
+    final dashboard = dashboardAsync.value;
+    final activeGroups = groups.where((g) => g.isActive).length;
+    final alerts = dashboard?['alerts'] as List? ?? [];
+    final upcomingDue = dashboard?['upcomingDue'] as List? ?? [];
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -106,7 +113,7 @@ class _GerantHomeScreenState extends State<GerantHomeScreen> {
                                   fontSize: 16,
                                   color: AppColors.primary,
                                 )),
-                            Text('${_groups.length} groupe(s)',
+                            Text('${groups.length} groupe(s)',
                                 style: AppTextStyles.caption),
                           ],
                         ),
@@ -135,7 +142,7 @@ class _GerantHomeScreenState extends State<GerantHomeScreen> {
               ),
 
               // ── Alertes (retards + dues bientôt)
-              if (!_loading && (alerts.isNotEmpty || upcomingDue.isNotEmpty))
+              if (!loading && (alerts.isNotEmpty || upcomingDue.isNotEmpty))
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(
@@ -176,7 +183,7 @@ class _GerantHomeScreenState extends State<GerantHomeScreen> {
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.all(AppSpacing.lg),
-                  child: _loading
+                  child: loading
                       ? const Row(
                           children: [
                             Expanded(child: StatCardSkeleton()),
@@ -228,7 +235,7 @@ class _GerantHomeScreenState extends State<GerantHomeScreen> {
               ),
 
               // ── Liste groupes
-              if (_loading)
+              if (loading)
                 SliverPadding(
                   padding: const EdgeInsets.symmetric(
                       horizontal: AppSpacing.lg),
@@ -239,7 +246,7 @@ class _GerantHomeScreenState extends State<GerantHomeScreen> {
                     ),
                   ),
                 )
-              else if (_error != null)
+              else if (error != null)
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.all(AppSpacing.lg),
@@ -248,7 +255,7 @@ class _GerantHomeScreenState extends State<GerantHomeScreen> {
                         const Icon(Icons.wifi_off,
                             size: 48, color: AppColors.textHint),
                         const SizedBox(height: AppSpacing.md),
-                        Text(_error!, style: AppTextStyles.body),
+                        Text(error, style: AppTextStyles.body),
                         const SizedBox(height: AppSpacing.md),
                         AppButton(
                           label: 'Réessayer',
@@ -259,18 +266,18 @@ class _GerantHomeScreenState extends State<GerantHomeScreen> {
                     ),
                   ),
                 )
-              else if (_groups.isEmpty)
-                SliverToBoxAdapter(
+              else if (groups.isEmpty)
+                const SliverToBoxAdapter(
                   child: Padding(
-                    padding: const EdgeInsets.all(AppSpacing.xl),
+                    padding: EdgeInsets.all(AppSpacing.xl),
                     child: Column(
                       children: [
-                        const AppLogo(size: 64),
-                        const SizedBox(height: AppSpacing.md),
-                        const Text('Aucun groupe pour l\'instant',
+                        AppLogo(size: 64),
+                        SizedBox(height: AppSpacing.md),
+                        Text('Aucun groupe pour l\'instant',
                             style: AppTextStyles.h4),
-                        const SizedBox(height: AppSpacing.sm),
-                        const Text(
+                        SizedBox(height: AppSpacing.sm),
+                        Text(
                           'Créez votre premier groupe de tontine',
                           style: AppTextStyles.caption,
                           textAlign: TextAlign.center,
@@ -286,11 +293,11 @@ class _GerantHomeScreenState extends State<GerantHomeScreen> {
                   sliver: SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (ctx, i) => GroupCard(
-                        group: _groups[i],
+                        group: groups[i],
                         onTap: () => context
-                            .go('/gerant/groups/${_groups[i].id}'),
+                            .go('/gerant/groups/${groups[i].id}'),
                       ),
-                      childCount: _groups.length,
+                      childCount: groups.length,
                     ),
                   ),
                 ),
@@ -330,9 +337,9 @@ class _AlertCard extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 8),
         padding: const EdgeInsets.all(AppSpacing.md),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.06),
+          color: color.withValues(alpha: 0.06),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withOpacity(0.25)),
+          border: Border.all(color: color.withValues(alpha: 0.25)),
         ),
         child: Row(
           children: [
@@ -362,7 +369,7 @@ class _AlertCard extends StatelessWidget {
                 ],
               ),
             ),
-            Icon(Icons.chevron_right,
+            const Icon(Icons.chevron_right,
                 color: AppColors.textHint, size: 18),
           ],
         ),
@@ -390,9 +397,9 @@ class _StatCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.md),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: color.withOpacity(0.15)),
+          border: Border.all(color: color.withValues(alpha: 0.15)),
         ),
         child: Row(
           children: [

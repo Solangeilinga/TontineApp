@@ -132,7 +132,7 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
                           width: 72,
                           height: 72,
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.15),
+                            color: Colors.white.withValues(alpha: 0.15),
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(
@@ -154,7 +154,7 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
                         Text(
                           'Entrez votre code PIN pour continuer',
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.85),
+                            color: Colors.white.withValues(alpha: 0.85),
                             fontSize: 13,
                           ),
                         ),
@@ -212,10 +212,10 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
                           AppSpacing.lg, AppSpacing.md, AppSpacing.lg, 0),
                       padding: const EdgeInsets.all(AppSpacing.md),
                       decoration: BoxDecoration(
-                        color: AppColors.error.withOpacity(0.08),
+                        color: AppColors.error.withValues(alpha: 0.08),
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(
-                            color: AppColors.error.withOpacity(0.2)),
+                            color: AppColors.error.withValues(alpha: 0.2)),
                       ),
                       child: Row(
                         children: [

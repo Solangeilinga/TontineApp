@@ -76,7 +76,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
             TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Retour')),
             TextButton(
               onPressed: () => Navigator.pop(ctx, true),
-              child: Text('Confirmer', style: TextStyle(color: AppColors.error)),
+              child: const Text('Confirmer', style: TextStyle(color: AppColors.error)),
             ),
           ],
         ),
@@ -135,7 +135,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                         onReactivate: _reactivate,
                       ),
                       const SizedBox(height: 24),
-                      Text('Nos forfaits', style: AppTextStyles.h3),
+                      const Text('Nos forfaits', style: AppTextStyles.h3),
                       const SizedBox(height: 12),
                       ...PlanInfo.all.map((plan) => Padding(
                             padding: const EdgeInsets.only(bottom: 12),
@@ -274,7 +274,7 @@ class _PlanCard extends StatelessWidget {
                 padding: const EdgeInsets.only(top: 4),
                 child: Row(
                   children: [
-                    Icon(Icons.check_circle, size: 16, color: AppColors.success),
+                    const Icon(Icons.check_circle, size: 16, color: AppColors.success),
                     const SizedBox(width: 6),
                     Expanded(child: Text(f, style: AppTextStyles.caption)),
                   ],
@@ -285,9 +285,9 @@ class _PlanCard extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: isCurrent
-                  ? OutlinedButton(
+                  ? const OutlinedButton(
                       onPressed: null,
-                      child: const Text('Plan actuel'),
+                      child: Text('Plan actuel'),
                     )
                   : AppButton(label: 'Choisir ce forfait', onPressed: onSelect),
             ),
@@ -424,7 +424,7 @@ class _PaymentSheetState extends State<_PaymentSheet> {
       // confirmé. Permet de voir la vraie structure JSON dans la console.
       if (ops.isNotEmpty) {
         // ignore: avoid_print
-        print('🔍 RAW OPERATOR[0]: ${ops.first}');
+        debugPrint('🔍 RAW OPERATOR[0]: ${ops.first}');
       }
 
       final seen = <String>{};
@@ -523,7 +523,7 @@ class _PaymentSheetState extends State<_PaymentSheet> {
       children: [
         const Icon(Icons.phone_android, size: 48, color: AppColors.primary),
         const SizedBox(height: 12),
-        Text('Demande envoyée', style: AppTextStyles.h3),
+        const Text('Demande envoyée', style: AppTextStyles.h3),
         const SizedBox(height: 8),
         const Text(
           'Composez le code de confirmation reçu sur votre téléphone pour valider le paiement Mobile Money. Votre abonnement s\'active automatiquement dès la confirmation.',
@@ -560,7 +560,7 @@ class _PaymentSheetState extends State<_PaymentSheet> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: AppColors.error.withOpacity(0.08),
+                color: AppColors.error.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
@@ -569,7 +569,7 @@ class _PaymentSheetState extends State<_PaymentSheet> {
               ),
             )
           else ...[
-            Text('Pays', style: AppTextStyles.caption),
+            const Text('Pays', style: AppTextStyles.caption),
             const SizedBox(height: 6),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -620,7 +620,7 @@ class _PaymentSheetState extends State<_PaymentSheet> {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(Icons.info_outline, size: 14, color: AppColors.accent),
+                  const Icon(Icons.info_outline, size: 14, color: AppColors.accent),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
@@ -636,7 +636,7 @@ class _PaymentSheetState extends State<_PaymentSheet> {
                 ? Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: AppColors.error.withOpacity(0.08),
+                      color: AppColors.error.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
@@ -645,7 +645,7 @@ class _PaymentSheetState extends State<_PaymentSheet> {
                     ),
                   )
                 : DropdownButtonFormField<String>(
-                    value: _selectedOperator,
+                    initialValue: _selectedOperator,
                     decoration: const InputDecoration(
                       labelText: 'Opérateur *',
                       prefixIcon: Icon(Icons.sim_card_outlined),
@@ -675,7 +675,7 @@ class _PaymentSheetState extends State<_PaymentSheet> {
           ],
           if (_error != null && _countries.isNotEmpty) ...[
             const SizedBox(height: 12),
-            Text(_error!, style: TextStyle(color: AppColors.error)),
+            Text(_error!, style: const TextStyle(color: AppColors.error)),
           ],
           const SizedBox(height: 20),
           SizedBox(

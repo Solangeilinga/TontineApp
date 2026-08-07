@@ -7,6 +7,7 @@ import '../../services/profile_service.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/change_phone_sheet.dart';
 import '../../widgets/delete_account_sheet.dart';
+import '../../widgets/privacy_policy_link.dart';
 
 class TenantProfileScreen extends StatefulWidget {
   const TenantProfileScreen({super.key});
@@ -103,7 +104,7 @@ class _TenantProfileScreenState extends State<TenantProfileScreen> {
           TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Annuler')),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: Text('Déconnexion', style: TextStyle(color: AppColors.error)),
+            child: const Text('Déconnexion', style: TextStyle(color: AppColors.error)),
           ),
         ],
       ),
@@ -171,7 +172,7 @@ class _TenantProfileScreenState extends State<TenantProfileScreen> {
                           ),
                         ),
                         const SizedBox(height: AppSpacing.xl),
-                        Text('Nom complet', style: AppTextStyles.caption),
+                        const Text('Nom complet', style: AppTextStyles.caption),
                         const SizedBox(height: 6),
                         TextFormField(
                           controller: _nameCtrl,
@@ -183,7 +184,7 @@ class _TenantProfileScreenState extends State<TenantProfileScreen> {
                               : null,
                         ),
                         const SizedBox(height: AppSpacing.md),
-                        Text('Téléphone', style: AppTextStyles.caption),
+                        const Text('Téléphone', style: AppTextStyles.caption),
                         const SizedBox(height: 6),
                         InkWell(
                           onTap: _changePhone,
@@ -210,8 +211,8 @@ class _TenantProfileScreenState extends State<TenantProfileScreen> {
                             ),
                           ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 4),
+                        const Padding(
+                          padding: EdgeInsets.only(top: 4),
                           child: Text(
                             'Vos membres seront prévenus automatiquement si vous changez de numéro.',
                             style: AppTextStyles.caption,
@@ -224,11 +225,12 @@ class _TenantProfileScreenState extends State<TenantProfileScreen> {
                           onPressed: _saving ? null : _save,
                         ),
                         const SizedBox(height: AppSpacing.md),
+                        const Center(child: PrivacyPolicyLinkButton()),
                         Center(
                           child: TextButton.icon(
                             onPressed: _confirmLogout,
-                            icon: Icon(Icons.logout, color: AppColors.error, size: 18),
-                            label: Text('Se déconnecter',
+                            icon: const Icon(Icons.logout, color: AppColors.error, size: 18),
+                            label: const Text('Se déconnecter',
                                 style: TextStyle(color: AppColors.error)),
                           ),
                         ),

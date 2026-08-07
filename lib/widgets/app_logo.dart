@@ -26,7 +26,7 @@ class AppLogo extends StatelessWidget {
       height: size,
       decoration: BoxDecoration(
         color: white
-            ? Colors.white.withOpacity(0.15)
+            ? Colors.white.withValues(alpha: 0.15)
             : const Color(0xFFE8F5EE),
         borderRadius: BorderRadius.circular(size * 0.22),
       ),

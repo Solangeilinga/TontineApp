@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../config/app_theme.dart';
 import '../../services/api_service.dart';
 import '../../services/pin_service.dart'; // ← en haut du fichier
+import '../../widgets/pwa_install_dialog.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -20,6 +21,15 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   void initState() {
     super.initState();
     _checkAlreadyLoggedIn();
+    // Léger délai : laisse le temps à _checkAlreadyLoggedIn() de rediriger
+    // si l'utilisateur est déjà connecté, pour ne pas faire clignoter le
+    // rappel d'installation juste avant une navigation immédiate. No-op sur
+    // Android/iOS natif et si rien à proposer (voir PwaInstallService).
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(const Duration(seconds: 2), () {
+        if (mounted) maybeShowPwaInstallReminder(context);
+      });
+    });
   }
 
   Future<void> _checkAlreadyLoggedIn() async {
@@ -61,7 +71,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         width: 100,
                         height: 100,
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.15),
+                          color: Colors.white.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(28),
                         ),
                         child: ClipRRect(
@@ -96,7 +106,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 16,
-                          color: Colors.white.withOpacity(0.85),
+                          color: Colors.white.withValues(alpha: 0.85),
                           height: 1.5,
                         ),
                       ),
@@ -147,7 +157,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         children: [
                           Expanded(
                             child: Divider(
-                                color: Colors.white.withOpacity(0.3)),
+                                color: Colors.white.withValues(alpha: 0.3)),
                           ),
                           Padding(
                             padding:
@@ -155,14 +165,14 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                             child: Text(
                               'Vous êtes membre ?',
                               style: TextStyle(
-                                color: Colors.white.withOpacity(0.7),
+                                color: Colors.white.withValues(alpha: 0.7),
                                 fontSize: 13,
                               ),
                             ),
                           ),
                           Expanded(
                             child: Divider(
-                                color: Colors.white.withOpacity(0.3)),
+                                color: Colors.white.withValues(alpha: 0.3)),
                           ),
                         ],
                       ),
@@ -172,7 +182,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       ElevatedButton(
                         onPressed: () => context.go('/auth/member/join'),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white.withOpacity(0.15),
+                          backgroundColor: Colors.white.withValues(alpha: 0.15),
                           foregroundColor: Colors.white,
                           minimumSize: const Size(double.infinity, 52),
                           shape: RoundedRectangleBorder(
@@ -193,11 +203,11 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         child: Text(
                           'Déjà membre ? Se connecter',
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.85),
+                            color: Colors.white.withValues(alpha: 0.85),
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
                             decoration: TextDecoration.underline,
-                            decorationColor: Colors.white.withOpacity(0.85),
+                            decorationColor: Colors.white.withValues(alpha: 0.85),
                           ),
                         ),
                       ),

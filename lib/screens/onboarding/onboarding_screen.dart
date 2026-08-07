@@ -127,7 +127,7 @@ class _WelcomePage extends StatelessWidget {
               borderRadius: BorderRadius.circular(32),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.primary.withOpacity(0.15),
+                  color: AppColors.primary.withValues(alpha: 0.15),
                   blurRadius: 24,
                   offset: const Offset(0, 8),
                 ),
@@ -137,7 +137,7 @@ class _WelcomePage extends StatelessWidget {
             child: const AppLogo(size: 80),
           ),
           const SizedBox(height: AppSpacing.xl),
-          Text(
+          const Text(
             'Bienvenue sur MaTontine',
             style: AppTextStyles.h1,
             textAlign: TextAlign.center,
@@ -149,11 +149,11 @@ class _WelcomePage extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: AppSpacing.xl),
-          _FeatureRow(icon: Icons.groups_outlined, text: 'Créez et gérez plusieurs groupes'),
+          const _FeatureRow(icon: Icons.groups_outlined, text: 'Créez et gérez plusieurs groupes'),
           const SizedBox(height: 12),
-          _FeatureRow(icon: Icons.notifications_active_outlined, text: 'Rappels automatiques de cotisation'),
+          const _FeatureRow(icon: Icons.notifications_active_outlined, text: 'Rappels automatiques de cotisation'),
           const SizedBox(height: 12),
-          _FeatureRow(icon: Icons.fact_check_outlined, text: 'Journal complet de toutes les actions'),
+          const _FeatureRow(icon: Icons.fact_check_outlined, text: 'Journal complet de toutes les actions'),
         ],
       ),
     );
@@ -196,7 +196,7 @@ class _PlansPage extends StatelessWidget {
       child: Column(
         children: [
           const SizedBox(height: AppSpacing.md),
-          Text('Choisissez votre rythme', style: AppTextStyles.h2, textAlign: TextAlign.center),
+          const Text('Choisissez votre rythme', style: AppTextStyles.h2, textAlign: TextAlign.center),
           const SizedBox(height: 8),
           Text(
             'Commencez gratuitement. Passez à un forfait supérieur quand vos groupes grandissent.',

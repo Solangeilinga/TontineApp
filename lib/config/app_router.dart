@@ -1,7 +1,6 @@
 // lib/config/app_router.dart
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../config/app_theme.dart';
 import '../services/api_service.dart';
 import '../services/pin_service.dart';
 import '../screens/auth/welcome_screen.dart';
@@ -36,24 +35,24 @@ class AppRouter {
 
       if (loc == '/splash') {
         final loggedIn = await _apiService.isLoggedIn();
-        print('🚀 Splash — loggedIn: $loggedIn');
+        debugPrint('🚀 Splash — loggedIn: $loggedIn');
 
         if (!loggedIn) return '/welcome';
 
         final userType = await _apiService.getUserType() ?? 'tenant';
-        print('🚀 Splash — userType: $userType');
+        debugPrint('🚀 Splash — userType: $userType');
 
         final pinSetLocally = await _pinService.isPinSetLocally();
-        print('🚀 Splash — pinSetLocally: $pinSetLocally');
+        debugPrint('🚀 Splash — pinSetLocally: $pinSetLocally');
 
         if (pinSetLocally) return '/pin-login/$userType';
 
         try {
           final hasPin = await _pinService.isPinSet(userType);
-          print('🚀 Splash — pinSetAPI: $hasPin');
+          debugPrint('🚀 Splash — pinSetAPI: $hasPin');
           if (hasPin) return '/pin-login/$userType';
         } catch (e) {
-          print('❌ Erreur isPinSet: $e');
+          debugPrint('❌ Erreur isPinSet: $e');
         }
 
         return '/set-pin/$userType';
@@ -203,7 +202,7 @@ class _SplashScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(26),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.15),
+                    color: Colors.black.withValues(alpha: 0.15),
                     blurRadius: 20,
                     offset: const Offset(0, 8),
                   ),
@@ -237,7 +236,7 @@ class _SplashScreen extends StatelessWidget {
               'Gérez vos tontines facilement',
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.white.withOpacity(0.7),
+                color: Colors.white.withValues(alpha: 0.7),
               ),
             ),
           ],

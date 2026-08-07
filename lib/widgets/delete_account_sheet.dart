@@ -87,10 +87,10 @@ class _DeleteAccountSheetState extends State<_DeleteAccountSheet> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
+          const Row(
             children: [
-              const Icon(Icons.warning_amber_rounded, color: AppColors.error, size: 24),
-              const SizedBox(width: 8),
+              Icon(Icons.warning_amber_rounded, color: AppColors.error, size: 24),
+              SizedBox(width: 8),
               Text('Supprimer le compte', style: AppTextStyles.h3),
             ],
           ),
@@ -105,7 +105,7 @@ class _DeleteAccountSheetState extends State<_DeleteAccountSheet> {
             style: AppTextStyles.bodyMedium.copyWith(color: AppColors.error),
           ),
           const SizedBox(height: 16),
-          Text('Tapez SUPPRIMER pour confirmer', style: AppTextStyles.caption),
+          const Text('Tapez SUPPRIMER pour confirmer', style: AppTextStyles.caption),
           const SizedBox(height: 6),
           TextField(
             controller: _confirmCtrl,
@@ -117,7 +117,7 @@ class _DeleteAccountSheetState extends State<_DeleteAccountSheet> {
           ),
           if (_typedConfirmed) ...[
             const SizedBox(height: 16),
-            Text('Confirmez avec votre PIN', style: AppTextStyles.caption),
+            const Text('Confirmez avec votre PIN', style: AppTextStyles.caption),
             const SizedBox(height: 6),
             TextField(
               controller: _pinCtrl,
@@ -129,7 +129,7 @@ class _DeleteAccountSheetState extends State<_DeleteAccountSheet> {
           ],
           if (_error != null) ...[
             const SizedBox(height: 8),
-            Text(_error!, style: TextStyle(color: AppColors.error)),
+            Text(_error!, style: const TextStyle(color: AppColors.error)),
           ],
           const SizedBox(height: 12),
           SizedBox(

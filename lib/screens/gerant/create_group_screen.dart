@@ -153,7 +153,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                   color: AppColors.primarySurface,
                   borderRadius: BorderRadius.circular(12),
                   border:
-                      Border.all(color: AppColors.primary.withOpacity(0.3)),
+                      Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
                 ),
                 child: const Row(
                   children: [
@@ -218,7 +218,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: DropdownButtonFormField<String>(
-                      value: _frequencyUnit,
+                      initialValue: _frequencyUnit,
                       decoration: const InputDecoration(
                         contentPadding: EdgeInsets.symmetric(
                             horizontal: 12, vertical: 12),
@@ -294,7 +294,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                   SizedBox(
                     width: 90,
                     child: DropdownButtonFormField<String>(
-                      value: _currency,
+                      initialValue: _currency,
                       isExpanded: true,
                       decoration: const InputDecoration(
                         contentPadding: EdgeInsets.symmetric(
@@ -365,10 +365,10 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                   margin: const EdgeInsets.only(bottom: AppSpacing.md),
                   padding: const EdgeInsets.all(AppSpacing.md),
                   decoration: BoxDecoration(
-                    color: AppColors.error.withOpacity(0.08),
+                    color: AppColors.error.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
-                        color: AppColors.error.withOpacity(0.2)),
+                        color: AppColors.error.withValues(alpha: 0.2)),
                   ),
                   child: Row(
                     children: [
@@ -388,9 +388,9 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                 margin: const EdgeInsets.only(bottom: AppSpacing.md),
                 padding: const EdgeInsets.all(AppSpacing.md),
                 decoration: BoxDecoration(
-                  color: AppColors.warning.withOpacity(0.08),
+                  color: AppColors.warning.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.warning.withOpacity(0.25)),
+                  border: Border.all(color: AppColors.warning.withValues(alpha: 0.25)),
                 ),
                 child: const Row(
                   crossAxisAlignment: CrossAxisAlignment.start,

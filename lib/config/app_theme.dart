@@ -40,7 +40,12 @@ class AppTheme {
           seedColor: AppColors.primary,
           primary: AppColors.primary,
           secondary: AppColors.accent,
-          background: AppColors.background,
+          // `background` est déprécié depuis Flutter 3.18 (fusionné dans
+          // `surface`) — supprimé. `surface` ci-dessous porte déjà
+          // explicitement la bonne couleur (AppColors.surface), donc rien
+          // ne change visuellement. Rien dans le code ne lisait
+          // `colorScheme.background` (vérifié), seulement `AppColors.background`
+          // directement (une constante différente, toujours utilisée ailleurs).
           surface: AppColors.surface,
           error: AppColors.error,
         ),

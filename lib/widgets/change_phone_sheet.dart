@@ -111,7 +111,7 @@ class _ChangePhoneSheetState extends State<_ChangePhoneSheet> {
             if (!_otpStep) ...[
               Row(
                 children: [
-                  Icon(Icons.info_outline, size: 14, color: AppColors.accent),
+                  const Icon(Icons.info_outline, size: 14, color: AppColors.accent),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
@@ -154,7 +154,7 @@ class _ChangePhoneSheetState extends State<_ChangePhoneSheet> {
             ],
             if (_error != null) ...[
               const SizedBox(height: 8),
-              Text(_error!, style: TextStyle(color: AppColors.error)),
+              Text(_error!, style: const TextStyle(color: AppColors.error)),
             ],
             const SizedBox(height: 12),
             SizedBox(

@@ -326,7 +326,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
                   decoration: BoxDecoration(
                     color: AppColors.primarySurface,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppColors.primary.withOpacity(0.2)),
+                    border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -477,7 +477,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
   Widget _chip(String label, Color color) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
+          color: color.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(20),
         ),
         child: Text(label,
@@ -488,7 +488,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
   Widget _statusBadge(String label, Color color) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
+          color: color.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(20),
         ),
         child: Text(label,
@@ -607,7 +607,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
                       name: nameCtrl.text.trim(),
                       phone: '$countryCode${phoneCtrl.text.trim()}',
                     );
-                    if (mounted) {
+                    if (context.mounted) {
                       Navigator.pop(ctx);
                       _loadDetail();
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -760,15 +760,15 @@ class _MembersTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (members.isEmpty) {
-      return Center(
+      return const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.people_outline,
+            Icon(Icons.people_outline,
                 size: 56, color: AppColors.textHint),
-            const SizedBox(height: AppSpacing.md),
-            const Text('Aucun membre pour l\'instant', style: AppTextStyles.h4),
-            const SizedBox(height: AppSpacing.sm),
+            SizedBox(height: AppSpacing.md),
+            Text('Aucun membre pour l\'instant', style: AppTextStyles.h4),
+            SizedBox(height: AppSpacing.sm),
             Text(
               'Partagez le code d\'invitation pour ajouter des membres',
               style: AppTextStyles.caption,
@@ -1106,7 +1106,7 @@ class _ContributionsTabState extends State<_ContributionsTab> {
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: c.isLate
-                        ? AppColors.error.withOpacity(0.3)
+                        ? AppColors.error.withValues(alpha: 0.3)
                         : AppColors.border,
                   ),
                 ),
@@ -1125,7 +1125,7 @@ class _ContributionsTabState extends State<_ContributionsTab> {
                             horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
                           color: (c.isLate ? AppColors.error : _statusColor(c.status))
-                              .withOpacity(0.1),
+                              .withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
@@ -1240,7 +1240,7 @@ class _ContributionsTabState extends State<_ContributionsTab> {
                       groupId: widget.groupId,
                       startDate: selected,
                     );
-                    if (mounted) {
+                    if (context.mounted) {
                       Navigator.pop(ctx);
                       _load();
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -1256,7 +1256,7 @@ class _ContributionsTabState extends State<_ContributionsTab> {
                     try {
                       msg = (e as dynamic).response?.data?['message'] ?? msg;
                     } catch (_) {}
-                    if (mounted) {
+                    if (context.mounted) {
                       ScaffoldMessenger.of(context)
                           .showSnackBar(SnackBar(content: Text(msg)));
                     }
@@ -1512,18 +1512,18 @@ class _TurnsTabState extends State<_TurnsTab> {
     final doneTurns = turns.where((t) => t['status'] == 'DONE').toList();
 
     if (cycleNumber == null) {
-      return Center(
+      return const Center(
         child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.lg),
+          padding: EdgeInsets.all(AppSpacing.lg),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.calendar_today_outlined,
+              Icon(Icons.calendar_today_outlined,
                   size: 56, color: AppColors.textHint),
-              const SizedBox(height: AppSpacing.md),
-              const Text('Aucun cycle en cours', style: AppTextStyles.h4),
-              const SizedBox(height: AppSpacing.sm),
-              const Text(
+              SizedBox(height: AppSpacing.md),
+              Text('Aucun cycle en cours', style: AppTextStyles.h4),
+              SizedBox(height: AppSpacing.sm),
+              Text(
                 "Démarrez un cycle depuis l'onglet Cotisations pour générer "
                 "le calendrier des tours.",
                 style: AppTextStyles.caption,
@@ -1550,7 +1550,7 @@ class _TurnsTabState extends State<_TurnsTab> {
                   padding: const EdgeInsets.symmetric(
                       horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: AppColors.success.withOpacity(0.1),
+                    color: AppColors.success.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: const Text(
@@ -1578,16 +1578,16 @@ class _TurnsTabState extends State<_TurnsTab> {
             Container(
               padding: const EdgeInsets.all(AppSpacing.md),
               decoration: BoxDecoration(
-                color: AppColors.accent.withOpacity(0.08),
+                color: AppColors.accent.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: AppColors.accent.withOpacity(0.25)),
+                border: Border.all(color: AppColors.accent.withValues(alpha: 0.25)),
               ),
               child: Row(
                 children: [
                   const Icon(Icons.workspace_premium_outlined,
                       color: AppColors.accent, size: 22),
                   const SizedBox(width: 10),
-                  Expanded(
+                  const Expanded(
                     child: Text(
                       'Tous les membres ont reçu leur mise pour ce cycle.',
                       style: AppTextStyles.bodyMedium,
@@ -1627,7 +1627,7 @@ class _TurnsTabState extends State<_TurnsTab> {
                   width: 44,
                   height: 44,
                   decoration: BoxDecoration(
-                    color: AppColors.accent.withOpacity(0.1),
+                    color: AppColors.accent.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(Icons.workspace_premium_outlined,
@@ -1654,12 +1654,12 @@ class _TurnsTabState extends State<_TurnsTab> {
 
           // En attente de recevoir
           if (pendingTurns.isNotEmpty) ...[
-            Row(
+            const Row(
               children: [
-                const Icon(Icons.hourglass_empty,
+                Icon(Icons.hourglass_empty,
                     color: AppColors.warning, size: 18),
-                const SizedBox(width: 6),
-                const Text('Calendrier des tours',
+                SizedBox(width: 6),
+                Text('Calendrier des tours',
                     style: AppTextStyles.h3),
               ],
             ),
@@ -1675,25 +1675,25 @@ class _TurnsTabState extends State<_TurnsTab> {
                 margin: const EdgeInsets.only(bottom: 8),
                 decoration: BoxDecoration(
                   color: isLate
-                      ? AppColors.error.withOpacity(0.05)
+                      ? AppColors.error.withValues(alpha: 0.05)
                       : isNext
-                          ? AppColors.accent.withOpacity(0.06)
+                          ? AppColors.accent.withValues(alpha: 0.06)
                           : AppColors.surface,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: isLate
-                        ? AppColors.error.withOpacity(0.3)
+                        ? AppColors.error.withValues(alpha: 0.3)
                         : isNext
-                            ? AppColors.accent.withOpacity(0.3)
+                            ? AppColors.accent.withValues(alpha: 0.3)
                             : AppColors.border,
                   ),
                 ),
                 child: ListTile(
                   leading: CircleAvatar(
                     backgroundColor: isLate
-                        ? AppColors.error.withOpacity(0.15)
+                        ? AppColors.error.withValues(alpha: 0.15)
                         : isNext
-                            ? AppColors.accent.withOpacity(0.15)
+                            ? AppColors.accent.withValues(alpha: 0.15)
                             : AppColors.surfaceAlt,
                     child: Text(
                       '${t['turnNumber']}',
@@ -1739,7 +1739,7 @@ class _TurnsTabState extends State<_TurnsTab> {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 6, vertical: 1),
                           decoration: BoxDecoration(
-                            color: AppColors.error.withOpacity(0.12),
+                            color: AppColors.error.withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: const Text(
@@ -1797,12 +1797,12 @@ class _TurnsTabState extends State<_TurnsTab> {
 
           // Ont deja recu
           if (doneTurns.isNotEmpty) ...[
-            Row(
+            const Row(
               children: [
-                const Icon(Icons.check_circle,
+                Icon(Icons.check_circle,
                     color: AppColors.success, size: 18),
-                const SizedBox(width: 6),
-                const Text('Ont deja recu', style: AppTextStyles.h3),
+                SizedBox(width: 6),
+                Text('Ont deja recu', style: AppTextStyles.h3),
               ],
             ),
             const SizedBox(height: AppSpacing.sm),
@@ -1811,10 +1811,10 @@ class _TurnsTabState extends State<_TurnsTab> {
                 margin: const EdgeInsets.only(bottom: 8),
                 padding: const EdgeInsets.all(AppSpacing.md),
                 decoration: BoxDecoration(
-                  color: AppColors.success.withOpacity(0.05),
+                  color: AppColors.success.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                      color: AppColors.success.withOpacity(0.2)),
+                      color: AppColors.success.withValues(alpha: 0.2)),
                 ),
                 child: Row(
                   children: [
@@ -1840,7 +1840,7 @@ class _TurnsTabState extends State<_TurnsTab> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
-                        color: AppColors.success.withOpacity(0.1),
+                        color: AppColors.success.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: const Text(
@@ -1981,7 +1981,7 @@ class _ActivityTabState extends State<_ActivityTab> {
               padding: const EdgeInsets.symmetric(horizontal: 20),
               alignment: Alignment.centerRight,
               decoration: BoxDecoration(
-                color: AppColors.error.withOpacity(0.1),
+                color: AppColors.error.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Icon(Icons.delete_outline, color: AppColors.error),
@@ -2057,7 +2057,7 @@ class _ActivityIcon extends StatelessWidget {
       width: 36,
       height: 36,
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         shape: BoxShape.circle,
       ),
       child: Icon(icon, color: color, size: 18),

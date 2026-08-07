@@ -8,6 +8,7 @@ import '../../services/auth_service.dart';
 import '../../services/api_service.dart';
 import '../../services/pin_service.dart';
 import '../../widgets/app_button.dart';
+import '../../widgets/privacy_policy_link.dart';
 
 class TenantRegisterScreen extends StatefulWidget {
   const TenantRegisterScreen({super.key});
@@ -225,6 +226,8 @@ class _TenantRegisterScreenState extends State<TenantRegisterScreen> {
                                 recognizer: TapGestureRecognizer()
                                   ..onTap = () => context.push('/legal/terms'),
                               ),
+                              const TextSpan(text: ' et la '),
+                              privacyPolicyTextSpan(context),
                               const TextSpan(text: '.'),
                             ],
                           ),
@@ -294,9 +297,9 @@ class _TenantRegisterScreenState extends State<TenantRegisterScreen> {
         margin: const EdgeInsets.only(bottom: AppSpacing.md),
         padding: const EdgeInsets.all(AppSpacing.md),
         decoration: BoxDecoration(
-          color: AppColors.error.withOpacity(0.08),
+          color: AppColors.error.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: AppColors.error.withOpacity(0.2)),
+          border: Border.all(color: AppColors.error.withValues(alpha: 0.2)),
         ),
         child: Row(
           children: [

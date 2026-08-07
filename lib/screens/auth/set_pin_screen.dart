@@ -99,7 +99,7 @@ class _SetPinScreenState extends State<SetPinScreen> {
                           width: 72,
                           height: 72,
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.15),
+                            color: Colors.white.withValues(alpha: 0.15),
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(
@@ -126,7 +126,7 @@ class _SetPinScreenState extends State<SetPinScreen> {
                               : 'Ce code remplacera le SMS\npour vos prochaines connexions',
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.85),
+                            color: Colors.white.withValues(alpha: 0.85),
                             fontSize: 13,
                             height: 1.5,
                           ),
@@ -214,10 +214,10 @@ class _SetPinScreenState extends State<SetPinScreen> {
                           AppSpacing.lg, 0),
                       padding: const EdgeInsets.all(AppSpacing.md),
                       decoration: BoxDecoration(
-                        color: AppColors.error.withOpacity(0.08),
+                        color: AppColors.error.withValues(alpha: 0.08),
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(
-                            color: AppColors.error.withOpacity(0.2)),
+                            color: AppColors.error.withValues(alpha: 0.2)),
                       ),
                       child: Row(
                         children: [

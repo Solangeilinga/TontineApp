@@ -1,7 +1,6 @@
 // lib/screens/membre/membre_notifications_screen.dart
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:dio/dio.dart';
 import '../../config/app_theme.dart';
 import '../../models/notification_model.dart';
 import '../../services/api_service.dart';
@@ -133,7 +132,7 @@ class _MembreNotificationsScreenState
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           alignment: Alignment.centerRight,
                           decoration: BoxDecoration(
-                            color: AppColors.error.withOpacity(0.1),
+                            color: AppColors.error.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: const Icon(Icons.delete_outline,
@@ -148,7 +147,7 @@ class _MembreNotificationsScreenState
                           border: Border.all(
                             color: n.isRead
                                 ? AppColors.border
-                                : AppColors.primary.withOpacity(0.2),
+                                : AppColors.primary.withValues(alpha: 0.2),
                           ),
                         ),
                         child: ListTile(
@@ -156,7 +155,7 @@ class _MembreNotificationsScreenState
                             width: 42,
                             height: 42,
                             decoration: BoxDecoration(
-                              color: _typeColor(n.type).withOpacity(0.1),
+                              color: _typeColor(n.type).withValues(alpha: 0.1),
                               shape: BoxShape.circle,
                             ),
                             child: Icon(

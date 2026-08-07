@@ -28,7 +28,6 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
   bool _loading = false;
   bool _loadingData = true;
   String _errorMsg = '';
-  Group? _group;
 
   @override
   void initState() {
@@ -41,7 +40,6 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
       final detail = await _groupService.getGroupDetail(widget.groupId);
       final group = Group.fromJson(detail);
       setState(() {
-        _group = group;
         _nameCtrl.text = group.name;
         _amountCtrl.text = group.amount.toStringAsFixed(0);
         _currency = group.currency;
@@ -182,7 +180,7 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
                   const SizedBox(width: 10),
                   Expanded(
                     child: DropdownButtonFormField<String>(
-                      value: _frequencyUnit,
+                      initialValue: _frequencyUnit,
                       decoration: const InputDecoration(
                         contentPadding:
                             EdgeInsets.symmetric(horizontal: 12, vertical: 12),
@@ -244,7 +242,7 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
                   const SizedBox(width: 10),
                   Expanded(
                     child: DropdownButtonFormField<String>(
-                      value: _currency,
+                      initialValue: _currency,
                       decoration: const InputDecoration(labelText: 'Devise'),
                       items: const [
                         DropdownMenuItem(value: 'XOF', child: Text('XOF')),
@@ -292,7 +290,7 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
                   margin: const EdgeInsets.only(bottom: AppSpacing.md),
                   padding: const EdgeInsets.all(AppSpacing.md),
                   decoration: BoxDecoration(
-                    color: AppColors.error.withOpacity(0.08),
+                    color: AppColors.error.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(_errorMsg,

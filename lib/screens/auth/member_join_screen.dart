@@ -8,6 +8,7 @@ import '../../services/auth_service.dart';
 import '../../services/api_service.dart';
 import '../../services/pin_service.dart';
 import '../../widgets/app_button.dart';
+import '../../widgets/privacy_policy_link.dart';
 
 class MemberJoinScreen extends StatefulWidget {
   const MemberJoinScreen({super.key});
@@ -226,9 +227,9 @@ class _MemberJoinScreenState extends State<MemberJoinScreen> {
                 Container(
                   padding: const EdgeInsets.all(AppSpacing.md),
                   decoration: BoxDecoration(
-                    color: AppColors.warning.withOpacity(0.08),
+                    color: AppColors.warning.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppColors.warning.withOpacity(0.25)),
+                    border: Border.all(color: AppColors.warning.withValues(alpha: 0.25)),
                   ),
                   child: const Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -273,6 +274,8 @@ class _MemberJoinScreenState extends State<MemberJoinScreen> {
                                 recognizer: TapGestureRecognizer()
                                   ..onTap = () => context.push('/legal/terms'),
                               ),
+                              const TextSpan(text: ' et la '),
+                              privacyPolicyTextSpan(context),
                               const TextSpan(text: '.'),
                             ],
                           ),
@@ -355,9 +358,9 @@ class _MemberJoinScreenState extends State<MemberJoinScreen> {
         margin: const EdgeInsets.only(bottom: AppSpacing.md),
         padding: const EdgeInsets.all(AppSpacing.md),
         decoration: BoxDecoration(
-          color: AppColors.error.withOpacity(0.08),
+          color: AppColors.error.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: AppColors.error.withOpacity(0.2)),
+          border: Border.all(color: AppColors.error.withValues(alpha: 0.2)),
         ),
         child: Row(
           children: [

@@ -206,7 +206,7 @@ class _MyTurnTab extends StatelessWidget {
                   width: 56,
                   height: 56,
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.15),
+                    color: Colors.white.withValues(alpha: 0.15),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
@@ -221,7 +221,7 @@ class _MyTurnTab extends StatelessWidget {
                 Text(
                   hasReceived ? 'Mise reçue' : 'Mon tour',
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.85),
+                    color: Colors.white.withValues(alpha: 0.85),
                     fontSize: 14,
                   ),
                 ),
@@ -480,9 +480,9 @@ class _EstimatedDateCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.08),
+        color: color.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: color.withOpacity(0.25)),
+        border: Border.all(color: color.withValues(alpha: 0.25)),
       ),
       child: Row(
         children: [
@@ -490,7 +490,7 @@ class _EstimatedDateCard extends StatelessWidget {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.12),
+              color: color.withValues(alpha: 0.12),
               shape: BoxShape.circle,
             ),
             child: Icon(icon, color: color, size: 22),
@@ -627,7 +627,7 @@ class _MembersListTab extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: AppColors.success.withOpacity(0.1),
+                      color: AppColors.success.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: const Text(
@@ -801,11 +801,11 @@ class _MyContributionsTabState extends State<_MyContributionsTab> {
         ),
         const SizedBox(height: AppSpacing.md),
 
-        Row(
+        const Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text('Historique', style: AppTextStyles.h3),
-            const Text(
+            Text('Historique', style: AppTextStyles.h3),
+            Text(
               'Glisser pour retirer',
               style: TextStyle(fontSize: 11, color: AppColors.textHint),
             ),
@@ -825,7 +825,7 @@ class _MyContributionsTabState extends State<_MyContributionsTab> {
               padding: const EdgeInsets.symmetric(horizontal: 20),
               alignment: Alignment.centerRight,
               decoration: BoxDecoration(
-                color: AppColors.error.withOpacity(0.1),
+                color: AppColors.error.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Icon(Icons.delete_outline, color: AppColors.error),
@@ -837,7 +837,7 @@ class _MyContributionsTabState extends State<_MyContributionsTab> {
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: c.isLate
-                      ? AppColors.error.withOpacity(0.3)
+                      ? AppColors.error.withValues(alpha: 0.3)
                       : AppColors.border,
                 ),
               ),
@@ -846,7 +846,7 @@ class _MyContributionsTabState extends State<_MyContributionsTab> {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: _statusColor(c.status).withOpacity(0.1),
+                    color: _statusColor(c.status).withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
@@ -880,7 +880,7 @@ class _MyContributionsTabState extends State<_MyContributionsTab> {
                   padding: const EdgeInsets.symmetric(
                       horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: _statusColor(c.status).withOpacity(0.1),
+                    color: _statusColor(c.status).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
@@ -920,9 +920,9 @@ class _InfoCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.08),
+        color: color.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: color.withOpacity(0.15)),
+        border: Border.all(color: color.withValues(alpha: 0.15)),
       ),
       child: Column(
         children: [
@@ -964,9 +964,9 @@ class _StatPill extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color.withOpacity(0.2)),
+          border: Border.all(color: color.withValues(alpha: 0.2)),
         ),
         child: Column(
           children: [

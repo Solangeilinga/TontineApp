@@ -1,13 +1,14 @@
 {
-    "name": "tontineapp",
-    "short_name": "tontineapp",
+    "name": "MaTontine",
+    "short_name": "MaTontine",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#1B6B3A",
+    "theme_color": "#1B6B3A",
+    "description": "Gérez vos tontines facilement — cotisations, tours, membres, rappels.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
+    "lang": "fr",
     "icons": [
         {
             "src": "icons/Icon-192.png",

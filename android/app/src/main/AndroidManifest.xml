@@ -1,4 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Déclarée explicitement plutôt que de dépendre implicitement d'une
+         dépendance tierce (ex: firebase-messaging) qui la fusionnerait
+         elle-même dans le manifeste final. Sans cette ligne ICI (dans le
+         manifeste principal, utilisé par le build release), l'app publiée
+         sur le Play Store risque de ne plus avoir accès au réseau. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+
     <application
         android:label="MaTontine"
         android:name="${applicationName}"

@@ -118,9 +118,9 @@ class _MemberLoginScreenState extends State<MemberLoginScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Vous avez plusieurs comptes', style: AppTextStyles.h3),
+              const Text('Vous avez plusieurs comptes', style: AppTextStyles.h3),
               const SizedBox(height: 4),
-              Text(
+              const Text(
                 'Ce numéro est membre chez plusieurs gérants. Choisissez le compte à ouvrir.',
                 style: AppTextStyles.caption,
               ),
@@ -311,9 +311,9 @@ class _MemberLoginScreenState extends State<MemberLoginScreen> {
         margin: const EdgeInsets.only(bottom: AppSpacing.md),
         padding: const EdgeInsets.all(AppSpacing.md),
         decoration: BoxDecoration(
-          color: AppColors.error.withOpacity(0.08),
+          color: AppColors.error.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: AppColors.error.withOpacity(0.2)),
+          border: Border.all(color: AppColors.error.withValues(alpha: 0.2)),
         ),
         child: Row(
           children: [

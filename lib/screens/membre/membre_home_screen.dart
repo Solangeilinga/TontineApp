@@ -7,6 +7,7 @@ import '../../services/group_service.dart';
 import '../../services/api_service.dart';
 import '../../widgets/app_button.dart';
 import '../../widgets/skeleton_loader.dart';
+import '../../widgets/pwa_install_dialog.dart';
 
 class MembreHomeScreen extends StatefulWidget {
   const MembreHomeScreen({super.key});
@@ -29,6 +30,11 @@ class _MembreHomeScreenState extends State<MembreHomeScreen> {
     super.initState();
     _load();
     _loadUnreadCount();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(const Duration(seconds: 2), () {
+        if (mounted) maybeShowPwaInstallReminder(context);
+      });
+    });
   }
 
   Future<void> _load() async {
@@ -78,14 +84,14 @@ class _MembreHomeScreenState extends State<MembreHomeScreen> {
                   ),
                   child: Row(
                     children: [
-                      Expanded(
+                      const Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text('Bonjour 👋',
+                            Text('Bonjour 👋',
                                 style: AppTextStyles.caption),
-                            const SizedBox(height: 2),
-                            const Text('Mes tontines',
+                            SizedBox(height: 2),
+                            Text('Mes tontines',
                                 style: AppTextStyles.h2),
                           ],
                         ),
@@ -142,7 +148,7 @@ class _MembreHomeScreenState extends State<MembreHomeScreen> {
                         color: AppColors.textSecondary,
                         onPressed: () async {
                           await _apiService.lockSession();
-                          if (mounted) context.go('/pin-login/user');
+                          if (context.mounted) context.go('/pin-login/user');
                         },
                         tooltip: 'Verrouiller',
                       ),

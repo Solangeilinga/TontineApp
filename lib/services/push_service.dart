@@ -1,11 +1,18 @@
 // lib/services/push_service.dart
+import 'package:flutter/foundation.dart' show debugPrint, kIsWeb;
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'api_service.dart';
 
+// ⚠️ À COMPLÉTER : clé VAPID générée dans la console Firebase
+// (Paramètres du projet → Cloud Messaging → Web configuration → "Générer
+// une paire de clés"). Uniquement utilisée sur le web — ignorée sur
+// Android/iOS (le paramètre vapidKey de getToken() y est simplement inerte).
+const _webVapidKey = 'REMPLACER_PAR_LA_CLE_VAPID';
+
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  print('📩 Message background: ${message.messageId}');
+  debugPrint('📩 Message background: ${message.messageId}');
 }
 
 class PushService {
@@ -28,46 +35,53 @@ class PushService {
     );
 
     if (settings.authorizationStatus == AuthorizationStatus.denied) {
-      print('⚠️ Notifications refusées');
+      debugPrint('⚠️ Notifications refusées');
       return;
     }
 
-    // Initialiser notifications locales
-    const androidSettings =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
-    const iosSettings = DarwinInitializationSettings(
-      requestAlertPermission: true,
-      requestBadgePermission: true,
-      requestSoundPermission: true,
-    );
+    // flutter_local_notifications ne supporte pas le web correctement (pas
+    // de canal/permission natifs équivalents) — et c'est de toute façon
+    // inutile ici : sur le web, c'est le service worker
+    // (web/firebase-messaging-sw.js) qui affiche nativement la notification
+    // via l'API Notification du navigateur, pas ce plugin.
+    if (!kIsWeb) {
+      // Initialiser notifications locales
+      const androidSettings =
+          AndroidInitializationSettings('@mipmap/ic_launcher');
+      const iosSettings = DarwinInitializationSettings(
+        requestAlertPermission: true,
+        requestBadgePermission: true,
+        requestSoundPermission: true,
+      );
 
-    await _localNotifs.initialize(
-      const InitializationSettings(
-          android: androidSettings, iOS: iosSettings),
-      onDidReceiveNotificationResponse: (details) {
-        print('Notification tappée: ${details.payload}');
-      },
-    );
+      await _localNotifs.initialize(
+        const InitializationSettings(
+            android: androidSettings, iOS: iosSettings),
+        onDidReceiveNotificationResponse: (details) {
+          debugPrint('Notification tappée: ${details.payload}');
+        },
+      );
 
-    // ── Créer le canal Android — version compatible
-    const channel = AndroidNotificationChannel(
-      _channelId,
-      _channelName,
-      description: 'Notifications MaTontine',
-      importance: Importance.high,
-    );
+      // ── Créer le canal Android — version compatible
+      const channel = AndroidNotificationChannel(
+        _channelId,
+        _channelName,
+        description: 'Notifications MaTontine',
+        importance: Importance.high,
+      );
 
-    await _localNotifs
-        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
-        ?.createNotificationChannel(channel);
+      await _localNotifs
+          .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+          ?.createNotificationChannel(channel);
 
-    FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
-    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+      FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
+      FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+    }
 
     await _refreshToken();
     _messaging.onTokenRefresh.listen(_sendTokenToServer);
 
-    print('✅ Push notifications initialisées');
+    debugPrint('✅ Push notifications initialisées');
   }
 
   Future<void> _handleForegroundMessage(RemoteMessage message) async {
@@ -99,10 +113,12 @@ class PushService {
 
   Future<void> _refreshToken() async {
     try {
-      final token = await _messaging.getToken();
+      final token = await _messaging.getToken(
+        vapidKey: kIsWeb ? _webVapidKey : null,
+      );
       if (token != null) await _sendTokenToServer(token);
     } catch (e) {
-      print('❌ Erreur token FCM: $e');
+      debugPrint('❌ Erreur token FCM: $e');
     }
   }
 
@@ -111,9 +127,9 @@ class PushService {
       await _api.dio.put('/notifications/fcm-token', data: {
         'fcmToken': token,
       });
-      print('✅ Token FCM envoyé');
+      debugPrint('✅ Token FCM envoyé');
     } catch (e) {
-      print('❌ Erreur envoi token: $e');
+      debugPrint('❌ Erreur envoi token: $e');
     }
   }
 }

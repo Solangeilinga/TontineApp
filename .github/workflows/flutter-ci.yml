@@ -1,0 +1,35 @@
+name: Flutter CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  analyze_and_test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: Récupérer les dépendances
+        run: flutter pub get
+
+      - name: Analyse statique
+        # Volontairement SANS --fatal-infos pour ce premier CI : le code
+        # existant n'a jamais été passé au crible de `flutter analyze` (pas
+        # de SDK Flutter disponible pendant cet audit). Active
+        # --fatal-infos une fois que `flutter analyze` tourne à blanc en
+        # local, pour éviter un CI rouge dès le premier commit sur des
+        # infos préexistants sans rapport avec ce changement.
+        run: flutter analyze
+
+      - name: Vérifier le formatage
+        run: dart format --output=none --set-exit-if-changed .
+
+      - name: Lancer les tests
+        run: flutter test

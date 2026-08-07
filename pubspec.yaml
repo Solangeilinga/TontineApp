@@ -13,6 +13,14 @@ dependencies:
   # Navigation
   go_router: ^13.2.0
 
+  # State management
+  flutter_riverpod: ^2.5.1
+
+  # Web — URLs propres sans "#" (nécessite la config Netlify de redirection
+  # SPA, voir netlify.toml)
+  flutter_web_plugins:
+    sdk: flutter
+
   # HTTP / API
   dio: ^5.4.3
 
@@ -22,6 +30,7 @@ dependencies:
   # Firebase
   firebase_core: ^2.31.0
   firebase_messaging: ^14.9.1
+  firebase_crashlytics: ^3.5.7
   flutter_local_notifications: ^17.2.4
 
   # UI / Design
