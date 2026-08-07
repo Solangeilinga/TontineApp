@@ -8,7 +8,7 @@ class AppConstants {
   // publier. C'est la SEULE ligne à corriger, le lien est déjà branché
   // partout où il doit l'être (voir tenant_register_screen.dart,
   // member_join_screen.dart, tenant_profile_screen.dart, member_profile_screen.dart).
-  static const String privacyPolicyUrl = 'https://matontine.app/confidentialite';
+  static const String privacyPolicyUrl = 'https://matontinesite.netlify.app/privacy';
 
   static const String accessTokenKey = 'access_token';
   static const String refreshTokenKey = 'refresh_token';
