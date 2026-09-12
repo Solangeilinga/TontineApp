@@ -436,6 +436,21 @@ class _PaymentSheetState extends State<_PaymentSheet> {
     return op['otp_required'] == true || op['otpRequired'] == true;
   }
 
+  /// Code USSD à composer pour que l'opérateur envoie l'OTP — voir
+  /// https://new.sebpay.bj/fr/docs/otp. Sans cette étape (composer le
+  /// code AVANT de saisir un OTP), l'utilisateur se retrouve face à un
+  /// champ "Code OTP" sans jamais avoir reçu de code, puisque rien ne
+  /// déclenche l'envoi côté opérateur.
+  String? get _ussdCode {
+    if (_selectedOperator == null) return null;
+    final op = _operatorsForCountry.firstWhere(
+      (o) => o['code'] == _selectedOperator,
+      orElse: () => {},
+    );
+    final code = (op['ussd_code'] ?? op['ussdCode'])?.toString();
+    return (code == null || code.isEmpty) ? null : code;
+  }
+
   /// Le champ `country` renvoyé par SebPay peut être soit un objet, soit
   /// directement une chaîne — on gère les deux, en restant strict : un code
   /// ISO fait 2 ou 3 lettres, jamais un `id` numérique. Sans ça, un champ
@@ -750,11 +765,47 @@ class _PaymentSheetState extends State<_PaymentSheet> {
                   ),
             if (_otpRequired) ...[
               const SizedBox(height: 12),
+              if (_ussdCode != null)
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: AppColors.accent.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(Icons.dialpad,
+                          size: 20, color: AppColors.accent),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: RichText(
+                          text: TextSpan(
+                            style: AppTextStyles.caption
+                                .copyWith(color: AppColors.textPrimary),
+                            children: [
+                              const TextSpan(
+                                  text: 'Composez d\'abord ce code sur '
+                                      'votre téléphone pour recevoir '
+                                      'l\'OTP de votre opérateur : '),
+                              TextSpan(
+                                text: _ussdCode,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              const SizedBox(height: 12),
               TextFormField(
                 controller: _otpCtrl,
                 keyboardType: TextInputType.number,
                 decoration: const InputDecoration(
-                  labelText: 'Code OTP reçu par SMS *',
+                  labelText: 'Code OTP reçu de l\'opérateur *',
                   prefixIcon: Icon(Icons.sms_outlined),
                 ),
                 validator: (v) =>
