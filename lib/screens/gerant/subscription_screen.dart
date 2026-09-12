@@ -448,7 +448,12 @@ class _PaymentSheetState extends State<_PaymentSheet> {
       orElse: () => {},
     );
     final code = (op['ussd_code'] ?? op['ussdCode'])?.toString();
-    return (code == null || code.isEmpty) ? null : code;
+    if (code == null || code.isEmpty) return null;
+    // Certains codes USSD (ex: Burkina Faso, *144*4*6*montant#) contiennent
+    // un placeholder littéral "montant" à remplacer par le montant réel —
+    // sans ça l'utilisateur voit un code non composable tel quel.
+    return code.replaceAll(
+        RegExp('montant', caseSensitive: false), widget.plan.amount.toString());
   }
 
   /// Le champ `country` renvoyé par SebPay peut être soit un objet, soit
@@ -618,6 +623,20 @@ class _PaymentSheetState extends State<_PaymentSheet> {
   }
 
   Widget _buildSuccessState(BuildContext context) {
+    // Ce message était le même pour tous les opérateurs, y compris ceux où
+    // l'OTP est déjà saisi et envoyé DANS la requête qui vient de réussir
+    // (Orange) — leur dire de "composer le code reçu" après coup n'a aucun
+    // sens, il n'y a plus de code à composer. Ne s'applique qu'aux
+    // opérateurs sans OTP préalable (ex: Moov), où la confirmation se fait
+    // via une invite envoyée par l'opérateur sur le téléphone.
+    final message = _otpRequired
+        ? 'Votre paiement a été soumis avec le code de confirmation. '
+            'Votre abonnement s\'active automatiquement dès sa validation '
+            'par votre opérateur.'
+        : 'Suivez les instructions envoyées par votre opérateur sur votre '
+            'téléphone pour confirmer le paiement Mobile Money. Votre '
+            'abonnement s\'active automatiquement dès la confirmation.';
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -625,10 +644,7 @@ class _PaymentSheetState extends State<_PaymentSheet> {
         const SizedBox(height: 12),
         const Text('Demande envoyée', style: AppTextStyles.h3),
         const SizedBox(height: 8),
-        const Text(
-          'Composez le code de confirmation reçu sur votre téléphone pour valider le paiement Mobile Money. Votre abonnement s\'active automatiquement dès la confirmation.',
-          textAlign: TextAlign.center,
-        ),
+        Text(message, textAlign: TextAlign.center),
         const SizedBox(height: 20),
         SizedBox(
           width: double.infinity,
