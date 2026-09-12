@@ -1,5 +1,6 @@
 // lib/services/api_service.dart
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../config/app_constants.dart';
 
@@ -21,6 +22,32 @@ class ApiService {
   // on ne déclenche qu'UN seul appel réseau de refresh, partagé par toutes.
   Future<String?>? _refreshFuture;
 
+  // ── Diagnostic temporaire — à retirer une fois le bug de connexion
+  // identifié. Log le sort réel de chaque requête (départ, réponse ou
+  // erreur avec son type Dio exact) au lieu de laisser l'appelant deviner
+  // depuis un message générique "Erreur réseau".
+  InterceptorsWrapper _debugLogInterceptor(String label) {
+    return InterceptorsWrapper(
+      onRequest: (options, handler) {
+        debugPrint(
+            '[$label] → ${options.method} ${options.baseUrl}${options.path}');
+        handler.next(options);
+      },
+      onResponse: (response, handler) {
+        debugPrint(
+            '[$label] ← ${response.statusCode} ${response.requestOptions.path}');
+        handler.next(response);
+      },
+      onError: (error, handler) {
+        debugPrint('[$label] ✗ ${error.requestOptions.path} '
+            'type=${error.type} message=${error.message} '
+            'status=${error.response?.statusCode} '
+            'data=${error.response?.data}');
+        handler.next(error);
+      },
+    );
+  }
+
   void init() {
     // ── Dio avec token d'authentification
     dio = Dio(BaseOptions(
@@ -29,6 +56,8 @@ class ApiService {
       receiveTimeout: const Duration(seconds: 45),
       headers: {'Content-Type': 'application/json'},
     ));
+
+    dio.interceptors.add(_debugLogInterceptor('dio'));
 
     dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
@@ -74,6 +103,7 @@ class ApiService {
       receiveTimeout: const Duration(seconds: 45),
       headers: {'Content-Type': 'application/json'},
     ));
+    dioNoAuth.interceptors.add(_debugLogInterceptor('dioNoAuth'));
   }
 
   Future<void> saveTokens({
