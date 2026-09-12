@@ -4,9 +4,15 @@
 # elle-même (clone officiel, canal stable) avant de builder. Ça ralentit un
 # peu chaque build (~2-3 min pour cloner Flutter), mais évite de dépendre
 # d'un plugin Netlify tiers non maintenu par Google/Flutter.
+#
+# `rm -rf flutter` avant le clone : Netlify met en cache le dossier de build
+# entre deux runs, donc `flutter/` d'un build précédent peut encore être là
+# — sans ce nettoyage, `git clone` échoue avec "destination path already
+# exists" (vu en prod le 12/09).
 
 [build]
   command = """
+    rm -rf flutter && \
     git clone https://github.com/flutter/flutter.git -b stable --depth 1 && \
     export PATH="$PATH:$PWD/flutter/bin" && \
     flutter doctor && \
