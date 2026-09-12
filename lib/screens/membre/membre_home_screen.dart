@@ -38,16 +38,27 @@ class _MembreHomeScreenState extends State<MembreHomeScreen> {
   }
 
   Future<void> _load() async {
-    setState(() { _loading = true; _error = null; });
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
     try {
       final groups = await _groupService.getMemberGroups();
       if (!mounted) return;
-      setState(() { _groups = groups; });
+      setState(() {
+        _groups = groups;
+      });
     } catch (e) {
       if (!mounted) return;
-      setState(() { _error = 'Erreur de chargement'; });
+      setState(() {
+        _error = 'Erreur de chargement';
+      });
     } finally {
-      if (mounted) setState(() { _loading = false; });
+      if (mounted) {
+        setState(() {
+          _loading = false;
+        });
+      }
     }
   }
 
@@ -55,7 +66,9 @@ class _MembreHomeScreenState extends State<MembreHomeScreen> {
     try {
       final res = await _apiService.dio.get('/notifications/unread-count');
       if (!mounted) return;
-      setState(() { _unreadCount = res.data['data']['count'] ?? 0; });
+      setState(() {
+        _unreadCount = res.data['data']['count'] ?? 0;
+      });
     } catch (_) {
       // silencieux — le badge reste simplement à 0 en cas d'erreur réseau
     }
@@ -79,8 +92,7 @@ class _MembreHomeScreenState extends State<MembreHomeScreen> {
                   padding: const EdgeInsets.all(AppSpacing.lg),
                   decoration: const BoxDecoration(
                     color: AppColors.surface,
-                    border: Border(
-                        bottom: BorderSide(color: AppColors.border)),
+                    border: Border(bottom: BorderSide(color: AppColors.border)),
                   ),
                   child: Row(
                     children: [
@@ -88,11 +100,9 @@ class _MembreHomeScreenState extends State<MembreHomeScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Bonjour 👋',
-                                style: AppTextStyles.caption),
+                            Text('Bonjour 👋', style: AppTextStyles.caption),
                             SizedBox(height: 2),
-                            Text('Mes tontines',
-                                style: AppTextStyles.h2),
+                            Text('Mes tontines', style: AppTextStyles.h2),
                           ],
                         ),
                       ),
@@ -172,8 +182,8 @@ class _MembreHomeScreenState extends State<MembreHomeScreen> {
 
               const SliverToBoxAdapter(
                 child: Padding(
-                  padding: EdgeInsets.fromLTRB(AppSpacing.lg, 0,
-                      AppSpacing.lg, AppSpacing.sm),
+                  padding: EdgeInsets.fromLTRB(
+                      AppSpacing.lg, 0, AppSpacing.lg, AppSpacing.sm),
                   child: Text('Mes groupes', style: AppTextStyles.h3),
                 ),
               ),
@@ -181,8 +191,8 @@ class _MembreHomeScreenState extends State<MembreHomeScreen> {
               // ── Liste groupes
               if (_loading)
                 SliverPadding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.lg),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
                   sliver: SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (_, i) => const GroupCardSkeleton(),
@@ -230,8 +240,7 @@ class _MembreHomeScreenState extends State<MembreHomeScreen> {
                         const SizedBox(height: AppSpacing.lg),
                         AppButton(
                           label: 'Rejoindre un groupe',
-                          onPressed: () =>
-                              context.go('/auth/member/join'),
+                          onPressed: () => context.go('/auth/member/join'),
                           icon: Icons.add,
                         ),
                       ],
@@ -240,14 +249,14 @@ class _MembreHomeScreenState extends State<MembreHomeScreen> {
                 )
               else
                 SliverPadding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.lg),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
                   sliver: SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (ctx, i) => _MembreGroupCard(
                         group: _groups[i],
-                        onTap: () => context
-                            .go('/membre/groups/${_groups[i].id}'),
+                        onTap: () =>
+                            context.go('/membre/groups/${_groups[i].id}'),
                       ),
                       childCount: _groups.length,
                     ),

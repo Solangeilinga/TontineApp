@@ -87,17 +87,14 @@ class _GerantHomeScreenState extends ConsumerState<GerantHomeScreen> {
           color: AppColors.primary,
           child: CustomScrollView(
             slivers: [
-
               // ── Header
               SliverToBoxAdapter(
                 child: Container(
-                  padding: const EdgeInsets.fromLTRB(
-                      AppSpacing.lg, AppSpacing.md,
-                      AppSpacing.lg, AppSpacing.md),
+                  padding: const EdgeInsets.fromLTRB(AppSpacing.lg,
+                      AppSpacing.md, AppSpacing.lg, AppSpacing.md),
                   decoration: const BoxDecoration(
                     color: AppColors.surface,
-                    border: Border(
-                        bottom: BorderSide(color: AppColors.border)),
+                    border: Border(bottom: BorderSide(color: AppColors.border)),
                   ),
                   child: Row(
                     children: [
@@ -146,8 +143,7 @@ class _GerantHomeScreenState extends ConsumerState<GerantHomeScreen> {
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(
-                        AppSpacing.lg, AppSpacing.md,
-                        AppSpacing.lg, 0),
+                        AppSpacing.lg, AppSpacing.md, AppSpacing.lg, 0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -157,23 +153,25 @@ class _GerantHomeScreenState extends ConsumerState<GerantHomeScreen> {
 
                         // Retards
                         ...alerts.map((a) => _AlertCard(
-                          icon: Icons.warning_outlined,
-                          color: AppColors.error,
-                          title: a['groupName'],
-                          message: a['message'],
-                          members: List<String>.from(a['members'] ?? []),
-                          onTap: () => context.go('/gerant/groups/${a['groupId']}'),
-                        )),
+                              icon: Icons.warning_outlined,
+                              color: AppColors.error,
+                              title: a['groupName'],
+                              message: a['message'],
+                              members: List<String>.from(a['members'] ?? []),
+                              onTap: () =>
+                                  context.go('/gerant/groups/${a['groupId']}'),
+                            )),
 
                         // Dues bientôt
                         ...upcomingDue.map((a) => _AlertCard(
-                          icon: Icons.schedule_outlined,
-                          color: AppColors.warning,
-                          title: a['groupName'],
-                          message: a['message'],
-                          members: const [],
-                          onTap: () => context.go('/gerant/groups/${a['groupId']}'),
-                        )),
+                              icon: Icons.schedule_outlined,
+                              color: AppColors.warning,
+                              title: a['groupName'],
+                              message: a['message'],
+                              members: const [],
+                              onTap: () =>
+                                  context.go('/gerant/groups/${a['groupId']}'),
+                            )),
                       ],
                     ),
                   ),
@@ -216,8 +214,8 @@ class _GerantHomeScreenState extends ConsumerState<GerantHomeScreen> {
               // ── Bouton créer
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.lg),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
                   child: AppButton(
                     label: 'Créer un nouveau groupe',
                     onPressed: () => context.go('/gerant/groups/create'),
@@ -228,8 +226,8 @@ class _GerantHomeScreenState extends ConsumerState<GerantHomeScreen> {
 
               const SliverToBoxAdapter(
                 child: Padding(
-                  padding: EdgeInsets.fromLTRB(AppSpacing.lg,
-                      AppSpacing.lg, AppSpacing.lg, AppSpacing.sm),
+                  padding: EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.lg,
+                      AppSpacing.lg, AppSpacing.sm),
                   child: Text('Mes groupes', style: AppTextStyles.h3),
                 ),
               ),
@@ -237,8 +235,8 @@ class _GerantHomeScreenState extends ConsumerState<GerantHomeScreen> {
               // ── Liste groupes
               if (loading)
                 SliverPadding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.lg),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
                   sliver: SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (_, i) => const GroupCardSkeleton(),
@@ -288,14 +286,14 @@ class _GerantHomeScreenState extends ConsumerState<GerantHomeScreen> {
                 )
               else
                 SliverPadding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.lg),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
                   sliver: SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (ctx, i) => GroupCard(
                         group: groups[i],
-                        onTap: () => context
-                            .go('/gerant/groups/${groups[i].id}'),
+                        onTap: () =>
+                            context.go('/gerant/groups/${groups[i].id}'),
                       ),
                       childCount: groups.length,
                     ),

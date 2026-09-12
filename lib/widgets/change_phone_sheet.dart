@@ -19,7 +19,8 @@ Future<String?> showChangePhoneSheet(
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
     ),
-    builder: (_) => _ChangePhoneSheet(requestOtp: requestOtp, verifyOtp: verifyOtp),
+    builder: (_) =>
+        _ChangePhoneSheet(requestOtp: requestOtp, verifyOtp: verifyOtp),
   );
 }
 
@@ -53,36 +54,56 @@ class _ChangePhoneSheetState extends State<_ChangePhoneSheet> {
 
   Future<void> _sendOtp() async {
     if (!_formKey.currentState!.validate()) return;
-    setState(() { _loading = true; _error = null; });
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
     try {
       await widget.requestOtp(_newPhone);
-      setState(() { _otpStep = true; });
+      setState(() {
+        _otpStep = true;
+      });
     } catch (e) {
-      setState(() { _error = _extractError(e); });
+      setState(() {
+        _error = _extractError(e);
+      });
     } finally {
-      setState(() { _loading = false; });
+      setState(() {
+        _loading = false;
+      });
     }
   }
 
   Future<void> _confirm() async {
     if (_otpCtrl.text.trim().length < 4) {
-      setState(() { _error = 'Code invalide'; });
+      setState(() {
+        _error = 'Code invalide';
+      });
       return;
     }
-    setState(() { _loading = true; _error = null; });
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
     try {
       await widget.verifyOtp(_newPhone, _otpCtrl.text.trim());
       if (mounted) Navigator.pop(context, _newPhone);
     } catch (e) {
-      setState(() { _error = _extractError(e); });
+      setState(() {
+        _error = _extractError(e);
+      });
     } finally {
-      setState(() { _loading = false; });
+      setState(() {
+        _loading = false;
+      });
     }
   }
 
   String _extractError(Object e) {
     if (e is DioException) {
-      final msg = e.response?.data is Map ? e.response?.data['message'] as String? : null;
+      final msg = e.response?.data is Map
+          ? e.response?.data['message'] as String?
+          : null;
       if (msg != null && msg.isNotEmpty) return msg;
     }
     return 'Une erreur est survenue. Réessayez.';
@@ -111,12 +132,14 @@ class _ChangePhoneSheetState extends State<_ChangePhoneSheet> {
             if (!_otpStep) ...[
               Row(
                 children: [
-                  const Icon(Icons.info_outline, size: 14, color: AppColors.accent),
+                  const Icon(Icons.info_outline,
+                      size: 14, color: AppColors.accent),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
                       'Toutes les personnes concernées (gérant et/ou membres) seront informées automatiquement de ce changement.',
-                      style: AppTextStyles.caption.copyWith(color: AppColors.accent),
+                      style: AppTextStyles.caption
+                          .copyWith(color: AppColors.accent),
                     ),
                   ),
                 ],
@@ -130,7 +153,9 @@ class _ChangePhoneSheetState extends State<_ChangePhoneSheet> {
                   hintText: 'Ex: +22961000000',
                   prefixIcon: Icon(Icons.phone_outlined),
                 ),
-                validator: (v) => (v == null || v.trim().length < 8) ? 'Numéro invalide' : null,
+                validator: (v) => (v == null || v.trim().length < 8)
+                    ? 'Numéro invalide'
+                    : null,
               ),
             ] else ...[
               Text(
@@ -148,7 +173,12 @@ class _ChangePhoneSheetState extends State<_ChangePhoneSheet> {
               ),
               const SizedBox(height: 4),
               TextButton(
-                onPressed: _loading ? null : () => setState(() { _otpStep = false; _error = null; }),
+                onPressed: _loading
+                    ? null
+                    : () => setState(() {
+                          _otpStep = false;
+                          _error = null;
+                        }),
                 child: const Text('Modifier le numéro'),
               ),
             ],

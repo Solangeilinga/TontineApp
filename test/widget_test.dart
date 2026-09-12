@@ -18,7 +18,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:matontine/main.dart';
 
 void main() {
-  testWidgets('TontineApp démarre et construit son widget racine sans exception',
+  testWidgets(
+      'TontineApp démarre et construit son widget racine sans exception',
       (tester) async {
     // Enveloppé dans ProviderScope, comme dans main.dart — sans ça, tout
     // écran utilisant Riverpod (ConsumerWidget/ref.watch) lèverait une

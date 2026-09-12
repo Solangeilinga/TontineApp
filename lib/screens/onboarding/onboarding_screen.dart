@@ -58,7 +58,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 child: TextButton(
                   onPressed: () => _finish(),
                   child: Text('Passer',
-                      style: AppTextStyles.body.copyWith(color: AppColors.textSecondary)),
+                      style: AppTextStyles.body
+                          .copyWith(color: AppColors.textSecondary)),
                 ),
               ),
             ),
@@ -68,7 +69,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 onPageChanged: (i) => setState(() => _page = i),
                 children: [
                   _WelcomePage(),
-                  _PlansPage(onSeePlans: () => _finish(goToRoute: '/gerant/subscription')),
+                  _PlansPage(
+                      onSeePlans: () =>
+                          _finish(goToRoute: '/gerant/subscription')),
                 ],
               ),
             ),
@@ -149,11 +152,17 @@ class _WelcomePage extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: AppSpacing.xl),
-          const _FeatureRow(icon: Icons.groups_outlined, text: 'Créez et gérez plusieurs groupes'),
+          const _FeatureRow(
+              icon: Icons.groups_outlined,
+              text: 'Créez et gérez plusieurs groupes'),
           const SizedBox(height: 12),
-          const _FeatureRow(icon: Icons.notifications_active_outlined, text: 'Rappels automatiques de cotisation'),
+          const _FeatureRow(
+              icon: Icons.notifications_active_outlined,
+              text: 'Rappels automatiques de cotisation'),
           const SizedBox(height: 12),
-          const _FeatureRow(icon: Icons.fact_check_outlined, text: 'Journal complet de toutes les actions'),
+          const _FeatureRow(
+              icon: Icons.fact_check_outlined,
+              text: 'Journal complet de toutes les actions'),
         ],
       ),
     );
@@ -196,7 +205,8 @@ class _PlansPage extends StatelessWidget {
       child: Column(
         children: [
           const SizedBox(height: AppSpacing.md),
-          const Text('Choisissez votre rythme', style: AppTextStyles.h2, textAlign: TextAlign.center),
+          const Text('Choisissez votre rythme',
+              style: AppTextStyles.h2, textAlign: TextAlign.center),
           const SizedBox(height: 8),
           Text(
             'Commencez gratuitement. Passez à un forfait supérieur quand vos groupes grandissent.',
@@ -241,7 +251,9 @@ class _MiniPlanCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(plan.label, style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w700)),
+                Text(plan.label,
+                    style: AppTextStyles.body
+                        .copyWith(fontWeight: FontWeight.w700)),
                 const SizedBox(height: 2),
                 Text(
                   plan.features.join(' · '),
@@ -255,7 +267,8 @@ class _MiniPlanCard extends StatelessWidget {
           const SizedBox(width: 8),
           Text(
             plan.amount == 0 ? 'Gratuit' : '${plan.amount} FCFA',
-            style: AppTextStyles.body.copyWith(color: AppColors.primary, fontWeight: FontWeight.w700),
+            style: AppTextStyles.body.copyWith(
+                color: AppColors.primary, fontWeight: FontWeight.w700),
           ),
         ],
       ),

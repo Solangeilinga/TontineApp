@@ -28,7 +28,10 @@ class _AuditLogScreenState extends State<AuditLogScreen> {
   }
 
   Future<void> _load() async {
-    setState(() { _loading = true; _error = null; });
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
     try {
       final result = await _groupService.getAuditLog(widget.groupId);
       setState(() {
@@ -37,28 +40,46 @@ class _AuditLogScreenState extends State<AuditLogScreen> {
         _totalCount = result['totalCount'] as int;
       });
     } catch (_) {
-      setState(() { _error = 'Erreur de chargement'; });
+      setState(() {
+        _error = 'Erreur de chargement';
+      });
     } finally {
-      setState(() { _loading = false; });
+      setState(() {
+        _loading = false;
+      });
     }
   }
 
   IconData _iconFor(String action) {
     switch (action) {
-      case 'GROUP_CREATED': return Icons.add_circle_outline;
-      case 'GROUP_UPDATED': return Icons.edit_outlined;
-      case 'GROUP_ARCHIVED': return Icons.archive_outlined;
-      case 'GROUP_UNARCHIVED': return Icons.unarchive_outlined;
-      case 'MEMBER_ADDED': return Icons.person_add_outlined;
-      case 'MEMBER_UPDATED': return Icons.edit_outlined;
-      case 'MEMBER_REMOVED': return Icons.person_remove_outlined;
-      case 'TURN_ORDER_UPDATED': return Icons.swap_vert;
-      case 'CYCLE_CONTRIBUTIONS_CREATED': return Icons.add_card_outlined;
-      case 'CONTRIBUTION_MARKED_RECEIVED': return Icons.check_circle_outline;
-      case 'CONTRIBUTION_MARKED_LATE': return Icons.warning_outlined;
-      case 'TURN_MARKED_RECEIVED': return Icons.workspace_premium_outlined;
-      case 'CYCLE_CLOSED': return Icons.flag_outlined;
-      default: return Icons.info_outline;
+      case 'GROUP_CREATED':
+        return Icons.add_circle_outline;
+      case 'GROUP_UPDATED':
+        return Icons.edit_outlined;
+      case 'GROUP_ARCHIVED':
+        return Icons.archive_outlined;
+      case 'GROUP_UNARCHIVED':
+        return Icons.unarchive_outlined;
+      case 'MEMBER_ADDED':
+        return Icons.person_add_outlined;
+      case 'MEMBER_UPDATED':
+        return Icons.edit_outlined;
+      case 'MEMBER_REMOVED':
+        return Icons.person_remove_outlined;
+      case 'TURN_ORDER_UPDATED':
+        return Icons.swap_vert;
+      case 'CYCLE_CONTRIBUTIONS_CREATED':
+        return Icons.add_card_outlined;
+      case 'CONTRIBUTION_MARKED_RECEIVED':
+        return Icons.check_circle_outline;
+      case 'CONTRIBUTION_MARKED_LATE':
+        return Icons.warning_outlined;
+      case 'TURN_MARKED_RECEIVED':
+        return Icons.workspace_premium_outlined;
+      case 'CYCLE_CLOSED':
+        return Icons.flag_outlined;
+      default:
+        return Icons.info_outline;
     }
   }
 
@@ -157,8 +178,7 @@ class _AuditLogScreenState extends State<AuditLogScreen> {
                       child: ListView.separated(
                         padding: const EdgeInsets.all(AppSpacing.md),
                         itemCount: _logs.length + (_isTruncated ? 1 : 0),
-                        separatorBuilder: (_, __) =>
-                            const SizedBox(height: 8),
+                        separatorBuilder: (_, __) => const SizedBox(height: 8),
                         itemBuilder: (ctx, i) {
                           if (_isTruncated && i == 0) {
                             return _UpsellBanner(
@@ -260,8 +280,8 @@ class _UpsellBanner extends StatelessWidget {
               child: Text(
                 'Vous voyez $shownCount action(s) sur $totalCount. '
                 'Passez au plan Pro pour l\'historique complet.',
-                style: AppTextStyles.bodyMedium
-                    .copyWith(color: AppColors.primary),
+                style:
+                    AppTextStyles.bodyMedium.copyWith(color: AppColors.primary),
               ),
             ),
             const Icon(Icons.chevron_right, color: AppColors.primary),

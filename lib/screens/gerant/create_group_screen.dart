@@ -59,10 +59,10 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
         ? '1'
         : _frequencyValueCtrl.text.trim();
     final unit = {
-      'DAYS': int.tryParse(val) == 1 ? 'jour' : 'jours',
-      'WEEKS': int.tryParse(val) == 1 ? 'semaine' : 'semaines',
-      'MONTHS': 'mois',
-    }[_frequencyUnit] ??
+          'DAYS': int.tryParse(val) == 1 ? 'jour' : 'jours',
+          'WEEKS': int.tryParse(val) == 1 ? 'semaine' : 'semaines',
+          'MONTHS': 'mois',
+        }[_frequencyUnit] ??
         'mois';
     return 'Tous les $val $unit';
   }
@@ -79,7 +79,10 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
-    setState(() { _loading = true; _errorMsg = ''; });
+    setState(() {
+      _loading = true;
+      _errorMsg = '';
+    });
 
     final userDesc = _descCtrl.text.trim();
 
@@ -111,9 +114,13 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
       try {
         msg = (e as dynamic).response?.data?['message'] ?? msg;
       } catch (_) {}
-      setState(() { _errorMsg = msg; });
+      setState(() {
+        _errorMsg = msg;
+      });
     } finally {
-      setState(() { _loading = false; });
+      setState(() {
+        _loading = false;
+      });
     }
   }
 
@@ -131,7 +138,6 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
               // ── Nom du groupe
               TextFormField(
                 controller: _nameCtrl,
@@ -152,8 +158,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                 decoration: BoxDecoration(
                   color: AppColors.primarySurface,
                   borderRadius: BorderRadius.circular(12),
-                  border:
-                      Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
+                  border: Border.all(
+                      color: AppColors.primary.withValues(alpha: 0.3)),
                 ),
                 child: const Row(
                   children: [
@@ -205,8 +211,8 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                       textAlign: TextAlign.center,
                       onChanged: (_) => setState(() {}),
                       decoration: const InputDecoration(
-                        contentPadding: EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 12),
+                        contentPadding:
+                            EdgeInsets.symmetric(horizontal: 8, vertical: 12),
                       ),
                       validator: (v) {
                         final n = int.tryParse(v ?? '');
@@ -220,19 +226,16 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                     child: DropdownButtonFormField<String>(
                       initialValue: _frequencyUnit,
                       decoration: const InputDecoration(
-                        contentPadding: EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 12),
+                        contentPadding:
+                            EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                       ),
                       items: const [
-                        DropdownMenuItem(
-                            value: 'DAYS', child: Text('Jours')),
+                        DropdownMenuItem(value: 'DAYS', child: Text('Jours')),
                         DropdownMenuItem(
                             value: 'WEEKS', child: Text('Semaines')),
-                        DropdownMenuItem(
-                            value: 'MONTHS', child: Text('Mois')),
+                        DropdownMenuItem(value: 'MONTHS', child: Text('Mois')),
                       ],
-                      onChanged: (v) =>
-                          setState(() => _frequencyUnit = v!),
+                      onChanged: (v) => setState(() => _frequencyUnit = v!),
                     ),
                   ),
                 ],
@@ -266,8 +269,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
               const SizedBox(height: AppSpacing.md),
 
               // ── Montant + devise — CORRIGÉ overflow
-              const Text('Montant de cotisation *',
-                  style: AppTextStyles.label),
+              const Text('Montant de cotisation *', style: AppTextStyles.label),
               const SizedBox(height: AppSpacing.sm),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -297,24 +299,21 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                       initialValue: _currency,
                       isExpanded: true,
                       decoration: const InputDecoration(
-                        contentPadding: EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 12),
+                        contentPadding:
+                            EdgeInsets.symmetric(horizontal: 8, vertical: 12),
                       ),
                       items: const [
                         DropdownMenuItem(
                           value: 'XOF',
-                          child: Text('F CFA',
-                              style: TextStyle(fontSize: 13)),
+                          child: Text('F CFA', style: TextStyle(fontSize: 13)),
                         ),
                         DropdownMenuItem(
                           value: 'EUR',
-                          child: Text('EUR',
-                              style: TextStyle(fontSize: 13)),
+                          child: Text('EUR', style: TextStyle(fontSize: 13)),
                         ),
                         DropdownMenuItem(
                           value: 'USD',
-                          child: Text('USD',
-                              style: TextStyle(fontSize: 13)),
+                          child: Text('USD', style: TextStyle(fontSize: 13)),
                         ),
                       ],
                       onChanged: (v) => setState(() => _currency = v!),
@@ -390,12 +389,14 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                 decoration: BoxDecoration(
                   color: AppColors.warning.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.warning.withValues(alpha: 0.25)),
+                  border: Border.all(
+                      color: AppColors.warning.withValues(alpha: 0.25)),
                 ),
                 child: const Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(Icons.info_outline, color: AppColors.warning, size: 18),
+                    Icon(Icons.info_outline,
+                        color: AppColors.warning, size: 18),
                     SizedBox(width: 8),
                     Expanded(
                       child: Text(

@@ -5,11 +5,13 @@
 /// l'expiration côté backend — c'est TOUJOURS lui qu'il faut utiliser pour
 /// l'affichage, jamais `plan` seul (qui peut être un plan payant expiré).
 class TenantSubscription {
-  final String plan; // FREE | STARTER | PRO (brut, sans tenir compte de l'expiration)
+  final String
+      plan; // FREE | STARTER | PRO (brut, sans tenir compte de l'expiration)
   final String status; // ACTIVE | PAST_DUE | CANCELED
   final DateTime? currentPeriodEnd;
   final bool isValid;
-  final String effectivePlan; // FREE | STARTER | PRO (à utiliser pour l'affichage)
+  final String
+      effectivePlan; // FREE | STARTER | PRO (à utiliser pour l'affichage)
   final bool canReactivate;
   final Map<String, dynamic> limits;
 
@@ -23,7 +25,8 @@ class TenantSubscription {
     required this.limits,
   });
 
-  factory TenantSubscription.fromJson(Map<String, dynamic> json) => TenantSubscription(
+  factory TenantSubscription.fromJson(Map<String, dynamic> json) =>
+      TenantSubscription(
         plan: json['plan'] ?? 'FREE',
         status: json['status'] ?? 'ACTIVE',
         currentPeriodEnd: json['currentPeriodEnd'] != null

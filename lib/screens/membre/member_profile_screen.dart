@@ -41,7 +41,10 @@ class _MemberProfileScreenState extends State<MemberProfileScreen> {
   }
 
   Future<void> _load() async {
-    setState(() { _loading = true; _error = null; });
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
     try {
       final profile = await _profileService.getMemberProfile();
       setState(() {
@@ -50,15 +53,21 @@ class _MemberProfileScreenState extends State<MemberProfileScreen> {
         _tenantName = profile['tenantName'] ?? '';
       });
     } catch (_) {
-      setState(() { _error = 'Impossible de charger votre profil.'; });
+      setState(() {
+        _error = 'Impossible de charger votre profil.';
+      });
     } finally {
-      setState(() { _loading = false; });
+      setState(() {
+        _loading = false;
+      });
     }
   }
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
-    setState(() { _saving = true; });
+    setState(() {
+      _saving = true;
+    });
     try {
       await _profileService.updateMemberProfile(name: _nameCtrl.text.trim());
       if (mounted) {
@@ -73,7 +82,9 @@ class _MemberProfileScreenState extends State<MemberProfileScreen> {
         );
       }
     } finally {
-      setState(() { _saving = false; });
+      setState(() {
+        _saving = false;
+      });
     }
   }
 
@@ -87,10 +98,13 @@ class _MemberProfileScreenState extends State<MemberProfileScreen> {
       ),
     );
     if (newPhone != null) {
-      setState(() { _phone = newPhone; });
+      setState(() {
+        _phone = newPhone;
+      });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Numéro mis à jour. Le gérant a été prévenu.')),
+          const SnackBar(
+              content: Text('Numéro mis à jour. Le gérant a été prévenu.')),
         );
       }
     }
@@ -101,12 +115,16 @@ class _MemberProfileScreenState extends State<MemberProfileScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Se déconnecter'),
-        content: const Text('Vous devrez vous reconnecter avec votre numéro et un code SMS.'),
+        content: const Text(
+            'Vous devrez vous reconnecter avec votre numéro et un code SMS.'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Annuler')),
+          TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('Annuler')),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Déconnexion', style: TextStyle(color: AppColors.error)),
+            child: const Text('Déconnexion',
+                style: TextStyle(color: AppColors.error)),
           ),
         ],
       ),
@@ -120,7 +138,8 @@ class _MemberProfileScreenState extends State<MemberProfileScreen> {
   Future<void> _deleteAccount() async {
     final result = await showDeleteAccountSheet(
       context,
-      warningMessage: 'Le gérant sera informé. Votre nom sera retiré des groupes, mais '
+      warningMessage:
+          'Le gérant sera informé. Votre nom sera retiré des groupes, mais '
           'l\'historique des cotisations restera visible pour la gestion du groupe. '
           'Vos informations personnelles seront définitivement effacées.',
       onConfirm: (pin) => _profileService.deleteMemberAccount(pin),
@@ -223,7 +242,8 @@ class _MemberProfileScreenState extends State<MemberProfileScreen> {
                                     size: 20, color: AppColors.textSecondary),
                                 const SizedBox(width: 10),
                                 Expanded(
-                                    child: Text(_phone, style: AppTextStyles.body)),
+                                    child: Text(_phone,
+                                        style: AppTextStyles.body)),
                                 Text('Modifier',
                                     style: AppTextStyles.caption
                                         .copyWith(color: AppColors.primary)),
@@ -249,7 +269,8 @@ class _MemberProfileScreenState extends State<MemberProfileScreen> {
                         Center(
                           child: TextButton.icon(
                             onPressed: _confirmLogout,
-                            icon: const Icon(Icons.logout, color: AppColors.error, size: 18),
+                            icon: const Icon(Icons.logout,
+                                color: AppColors.error, size: 18),
                             label: const Text('Se déconnecter',
                                 style: TextStyle(color: AppColors.error)),
                           ),

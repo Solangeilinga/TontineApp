@@ -27,7 +27,8 @@ Future<void> openPrivacyPolicy(BuildContext context) async {
 /// introduite ici. Une vraie correction consisterait à convertir l'écran en
 /// StatefulWidget avec un recognizer stocké en champ + dispose(), pour LES
 /// DEUX liens (CGU et confidentialité) — hors scope de cet ajout ponctuel.
-TextSpan privacyPolicyTextSpan(BuildContext context, {String text = 'politique de confidentialité'}) {
+TextSpan privacyPolicyTextSpan(BuildContext context,
+    {String text = 'politique de confidentialité'}) {
   return TextSpan(
     text: text,
     style: const TextStyle(
@@ -35,7 +36,8 @@ TextSpan privacyPolicyTextSpan(BuildContext context, {String text = 'politique d
       fontWeight: FontWeight.w600,
       decoration: TextDecoration.underline,
     ),
-    recognizer: TapGestureRecognizer()..onTap = () => openPrivacyPolicy(context),
+    recognizer: TapGestureRecognizer()
+      ..onTap = () => openPrivacyPolicy(context),
   );
 }
 

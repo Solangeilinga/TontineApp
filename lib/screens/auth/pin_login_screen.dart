@@ -23,7 +23,9 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
   static const _maxAttempts = 5;
 
   Future<void> _verifyPin(String pin) async {
-    setState(() { _errorMsg = ''; });
+    setState(() {
+      _errorMsg = '';
+    });
 
     try {
       // Utiliser l'endpoint verrouillé — pas besoin de token
@@ -37,7 +39,9 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
           refreshToken: data['refreshToken'],
           userType: widget.userType,
         );
-        setState(() { _attempts = 0; });
+        setState(() {
+          _attempts = 0;
+        });
         if (mounted) {
           if (widget.userType == 'tenant') {
             context.go('/gerant/home');
@@ -75,13 +79,15 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
       // dire "code incorrect" : c'est trompeur si le code était en fait bon.
       if (e.response?.statusCode == 429) {
         setState(() {
-          _errorMsg = 'Trop de tentatives. Réessayez dans quelques minutes ou reconnectez-vous par SMS.';
+          _errorMsg =
+              'Trop de tentatives. Réessayez dans quelques minutes ou reconnectez-vous par SMS.';
         });
       } else if (e.type == DioExceptionType.connectionTimeout ||
           e.type == DioExceptionType.receiveTimeout ||
           e.type == DioExceptionType.connectionError) {
         setState(() {
-          _errorMsg = 'Connexion au serveur impossible. Vérifiez votre réseau et réessayez.';
+          _errorMsg =
+              'Connexion au serveur impossible. Vérifiez votre réseau et réessayez.';
         });
       } else {
         setState(() {
@@ -116,9 +122,8 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
                 children: [
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.fromLTRB(
-                        AppSpacing.lg, AppSpacing.xl,
-                        AppSpacing.lg, AppSpacing.xl),
+                    padding: const EdgeInsets.fromLTRB(AppSpacing.lg,
+                        AppSpacing.xl, AppSpacing.lg, AppSpacing.xl),
                     decoration: const BoxDecoration(
                       color: AppColors.primary,
                       borderRadius: BorderRadius.only(
@@ -161,16 +166,14 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
                       ],
                     ),
                   ),
-
                   const SizedBox(height: AppSpacing.xl),
                   const Text('Votre code PIN', style: AppTextStyles.h3),
                   const SizedBox(height: AppSpacing.sm),
                   const Text('4 chiffres', style: AppTextStyles.caption),
                   const SizedBox(height: AppSpacing.xl),
-
                   Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.xl),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
                     child: PinCodeTextField(
                       appContext: context,
                       length: 4,
@@ -205,7 +208,6 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
                       ),
                     ),
                   ),
-
                   if (_errorMsg.isNotEmpty)
                     Container(
                       margin: const EdgeInsets.fromLTRB(
@@ -230,9 +232,7 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
                         ],
                       ),
                     ),
-
                   const Spacer(),
-
                   Padding(
                     padding: const EdgeInsets.fromLTRB(
                         AppSpacing.lg, 0, AppSpacing.lg, AppSpacing.lg),

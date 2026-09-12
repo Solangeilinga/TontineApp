@@ -35,21 +35,34 @@ class _TenantLoginScreenState extends State<TenantLoginScreen> {
       setState(() => _errorMsg = 'Entrez votre numéro de téléphone');
       return;
     }
-    setState(() { _loading = true; _errorMsg = ''; });
+    setState(() {
+      _loading = true;
+      _errorMsg = '';
+    });
     try {
       await _authService.tenantLoginRequestOTP(_fullPhone);
-      setState(() { _otpSent = true; _resendCountdown = 60; });
+      setState(() {
+        _otpSent = true;
+        _resendCountdown = 60;
+      });
       _startCountdown();
     } catch (e) {
-      setState(() { _errorMsg = _parseError(e); });
+      setState(() {
+        _errorMsg = _parseError(e);
+      });
     } finally {
-      setState(() { _loading = false; });
+      setState(() {
+        _loading = false;
+      });
     }
   }
 
   Future<void> _verifyOTP() async {
     if (_otp.length < 6) return;
-    setState(() { _loading = true; _errorMsg = ''; });
+    setState(() {
+      _loading = true;
+      _errorMsg = '';
+    });
     try {
       final data = await _authService.tenantLoginVerify(
         phone: _fullPhone,
@@ -66,9 +79,13 @@ class _TenantLoginScreenState extends State<TenantLoginScreen> {
       final route = await _authService.getPostLoginRoute('tenant');
       if (mounted) context.go(route);
     } catch (e) {
-      setState(() { _errorMsg = _parseError(e); });
+      setState(() {
+        _errorMsg = _parseError(e);
+      });
     } finally {
-      setState(() { _loading = false; });
+      setState(() {
+        _loading = false;
+      });
     }
   }
 
@@ -76,7 +93,9 @@ class _TenantLoginScreenState extends State<TenantLoginScreen> {
     Future.doWhile(() async {
       await Future.delayed(const Duration(seconds: 1));
       if (!mounted) return false;
-      setState(() { _resendCountdown--; });
+      setState(() {
+        _resendCountdown--;
+      });
       return _resendCountdown > 0;
     });
   }
@@ -120,7 +139,6 @@ class _TenantLoginScreenState extends State<TenantLoginScreen> {
               style: AppTextStyles.caption,
             ),
             const SizedBox(height: AppSpacing.xl),
-
             if (!_otpSent) ...[
               Row(
                 children: [
@@ -216,7 +234,6 @@ class _TenantLoginScreenState extends State<TenantLoginScreen> {
                       ),
               ),
             ],
-
             const SizedBox(height: AppSpacing.lg),
             Center(
               child: TextButton(
@@ -247,13 +264,11 @@ class _TenantLoginScreenState extends State<TenantLoginScreen> {
         ),
         child: Row(
           children: [
-            const Icon(Icons.error_outline,
-                color: AppColors.error, size: 18),
+            const Icon(Icons.error_outline, color: AppColors.error, size: 18),
             const SizedBox(width: 8),
             Expanded(
               child: Text(_errorMsg,
-                  style: const TextStyle(
-                      color: AppColors.error, fontSize: 13)),
+                  style: const TextStyle(color: AppColors.error, fontSize: 13)),
             ),
           ],
         ),

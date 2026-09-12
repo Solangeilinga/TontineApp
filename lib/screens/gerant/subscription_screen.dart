@@ -27,14 +27,23 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   }
 
   Future<void> _load() async {
-    setState(() { _loading = true; _error = null; });
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
     try {
       final sub = await _subService.getMySubscription();
-      setState(() { _subscription = sub; });
+      setState(() {
+        _subscription = sub;
+      });
     } catch (_) {
-      setState(() { _error = 'Impossible de charger votre abonnement.'; });
+      setState(() {
+        _error = 'Impossible de charger votre abonnement.';
+      });
     } finally {
-      setState(() { _loading = false; });
+      setState(() {
+        _loading = false;
+      });
     }
   }
 
@@ -61,22 +70,27 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Vous pouvez garder l\'accès jusqu\'à la fin de votre période payée, ou revenir au plan Gratuit immédiatement.'),
+              const Text(
+                  'Vous pouvez garder l\'accès jusqu\'à la fin de votre période payée, ou revenir au plan Gratuit immédiatement.'),
               const SizedBox(height: 12),
               CheckboxListTile(
                 contentPadding: EdgeInsets.zero,
                 value: immediate,
                 onChanged: (v) => setDialogState(() => immediate = v ?? false),
-                title: const Text('Revenir au plan Gratuit maintenant', style: TextStyle(fontSize: 14)),
+                title: const Text('Revenir au plan Gratuit maintenant',
+                    style: TextStyle(fontSize: 14)),
                 controlAffinity: ListTileControlAffinity.leading,
               ),
             ],
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Retour')),
+            TextButton(
+                onPressed: () => Navigator.pop(ctx, false),
+                child: const Text('Retour')),
             TextButton(
               onPressed: () => Navigator.pop(ctx, true),
-              child: const Text('Confirmer', style: TextStyle(color: AppColors.error)),
+              child: const Text('Confirmer',
+                  style: TextStyle(color: AppColors.error)),
             ),
           ],
         ),
@@ -88,7 +102,8 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
     try {
       final msg = await _subService.cancel(immediate: immediate);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(msg)));
       }
       _load();
     } catch (_) {
@@ -104,7 +119,8 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
     try {
       final msg = await _subService.reactivate();
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(msg)));
       }
       _load();
     } catch (_) {
@@ -141,7 +157,8 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                             padding: const EdgeInsets.only(bottom: 12),
                             child: _PlanCard(
                               plan: plan,
-                              isCurrent: plan.key == _subscription!.effectivePlan,
+                              isCurrent:
+                                  plan.key == _subscription!.effectivePlan,
                               onSelect: plan.key == 'FREE'
                                   ? null
                                   : () => _openPaymentSheet(plan),
@@ -175,7 +192,8 @@ class _StatusCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final plan = PlanInfo.all.firstWhere((p) => p.key == subscription.effectivePlan);
+    final plan =
+        PlanInfo.all.firstWhere((p) => p.key == subscription.effectivePlan);
     final endDate = subscription.currentPeriodEnd;
 
     return Container(
@@ -197,7 +215,8 @@ class _StatusCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           if (subscription.isPastDue)
-            const Text('Votre abonnement a expiré. Renouvelez pour retrouver l\'accès complet.',
+            const Text(
+                'Votre abonnement a expiré. Renouvelez pour retrouver l\'accès complet.',
                 style: TextStyle(color: Colors.white))
           else if (subscription.isCanceledButActive && endDate != null)
             Text('Annulé — accès conservé jusqu\'au ${_formatDate(endDate)}.',
@@ -233,7 +252,8 @@ class _StatusCard extends StatelessWidget {
     );
   }
 
-  String _formatDate(DateTime d) => '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}';
+  String _formatDate(DateTime d) =>
+      '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}';
 }
 
 // ─── CARTE D'UN PLAN ────────────────────────────────────────────────────────
@@ -274,7 +294,8 @@ class _PlanCard extends StatelessWidget {
                 padding: const EdgeInsets.only(top: 4),
                 child: Row(
                   children: [
-                    const Icon(Icons.check_circle, size: 16, color: AppColors.success),
+                    const Icon(Icons.check_circle,
+                        size: 16, color: AppColors.success),
                     const SizedBox(width: 6),
                     Expanded(child: Text(f, style: AppTextStyles.caption)),
                   ],
@@ -316,17 +337,60 @@ class _PaymentSheet extends StatefulWidget {
 // SebPay (voir _loadOperators) — cette table sert uniquement à convertir un
 // code ISO en indicatif, pas à restreindre les pays affichés.
 const Map<String, String> _kDialCodes = {
-  'DZ': '213', 'AO': '244', 'BJ': '229', 'BW': '267', 'BF': '226',
-  'BI': '257', 'CV': '238', 'CM': '237', 'CF': '236', 'TD': '235',
-  'KM': '269', 'CG': '242', 'CD': '243', 'CI': '225', 'DJ': '253',
-  'EG': '20', 'GQ': '240', 'ER': '291', 'SZ': '268', 'ET': '251',
-  'GA': '241', 'GM': '220', 'GH': '233', 'GN': '224', 'GW': '245',
-  'KE': '254', 'LS': '266', 'LR': '231', 'LY': '218', 'MG': '261',
-  'MW': '265', 'ML': '223', 'MR': '222', 'MU': '230', 'MA': '212',
-  'MZ': '258', 'NA': '264', 'NE': '227', 'NG': '234', 'RW': '250',
-  'ST': '239', 'SN': '221', 'SC': '248', 'SL': '232', 'SO': '252',
-  'ZA': '27', 'SS': '211', 'SD': '249', 'TZ': '255', 'TG': '228',
-  'TN': '216', 'UG': '256', 'ZM': '260', 'ZW': '263',
+  'DZ': '213',
+  'AO': '244',
+  'BJ': '229',
+  'BW': '267',
+  'BF': '226',
+  'BI': '257',
+  'CV': '238',
+  'CM': '237',
+  'CF': '236',
+  'TD': '235',
+  'KM': '269',
+  'CG': '242',
+  'CD': '243',
+  'CI': '225',
+  'DJ': '253',
+  'EG': '20',
+  'GQ': '240',
+  'ER': '291',
+  'SZ': '268',
+  'ET': '251',
+  'GA': '241',
+  'GM': '220',
+  'GH': '233',
+  'GN': '224',
+  'GW': '245',
+  'KE': '254',
+  'LS': '266',
+  'LR': '231',
+  'LY': '218',
+  'MG': '261',
+  'MW': '265',
+  'ML': '223',
+  'MR': '222',
+  'MU': '230',
+  'MA': '212',
+  'MZ': '258',
+  'NA': '264',
+  'NE': '227',
+  'NG': '234',
+  'RW': '250',
+  'ST': '239',
+  'SN': '221',
+  'SC': '248',
+  'SL': '232',
+  'SO': '252',
+  'ZA': '27',
+  'SS': '211',
+  'SD': '249',
+  'TZ': '255',
+  'TG': '228',
+  'TN': '216',
+  'UG': '256',
+  'ZM': '260',
+  'ZW': '263',
 };
 
 /// Construit l'emoji drapeau à partir d'un code ISO à 2 lettres (ex: "BF"
@@ -381,7 +445,11 @@ class _PaymentSheetState extends State<_PaymentSheet> {
     final c = op['country'];
     String? candidate;
     if (c is Map) {
-      candidate = (c['code'] ?? c['iso'] ?? c['iso_code'] ?? c['alpha2'] ?? c['country_code'])
+      candidate = (c['code'] ??
+              c['iso'] ??
+              c['iso_code'] ??
+              c['alpha2'] ??
+              c['country_code'])
           ?.toString();
     } else if (c is String) {
       candidate = c;
@@ -397,7 +465,8 @@ class _PaymentSheetState extends State<_PaymentSheet> {
   String _countryNameOf(Map<String, dynamic> op) {
     final c = op['country'];
     if (c is Map) {
-      final name = (c['name'] ?? c['label'] ?? c['country_name'] ?? c['title'])?.toString();
+      final name = (c['name'] ?? c['label'] ?? c['country_name'] ?? c['title'])
+          ?.toString();
       if (name != null && name.trim().isNotEmpty) return name.trim();
     }
     // À défaut d'un vrai nom, on retombe sur le code ISO (déjà validé ci-
@@ -416,7 +485,10 @@ class _PaymentSheetState extends State<_PaymentSheet> {
   /// — aucun pays codé en dur, donc aucun risque d'en oublier un que SebPay
   /// ajouterait plus tard.
   Future<void> _loadOperators() async {
-    setState(() { _loading = true; _error = null; });
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
     try {
       final ops = await widget.subService.getOperators();
 
@@ -440,7 +512,8 @@ class _PaymentSheetState extends State<_PaymentSheet> {
       setState(() {
         _allOperators = ops;
         _countries = countries;
-        _selectedCountryIso = countries.isNotEmpty ? countries.first['iso'] : null;
+        _selectedCountryIso =
+            countries.isNotEmpty ? countries.first['iso'] : null;
       });
       _onCountryChanged(_selectedCountryIso);
     } catch (_) {
@@ -450,7 +523,9 @@ class _PaymentSheetState extends State<_PaymentSheet> {
         _error = 'Impossible de charger les opérateurs disponibles.';
       });
     } finally {
-      setState(() { _loading = false; });
+      setState(() {
+        _loading = false;
+      });
     }
   }
 
@@ -471,7 +546,10 @@ class _PaymentSheetState extends State<_PaymentSheet> {
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate() || _selectedOperator == null) return;
-    setState(() { _submitting = true; _error = null; });
+    setState(() {
+      _submitting = true;
+      _error = null;
+    });
     try {
       // SebPay attend le numéro au format international SANS le "+".
       // Si on connaît l'indicatif du pays et que l'utilisateur n'a saisi
@@ -489,7 +567,9 @@ class _PaymentSheetState extends State<_PaymentSheet> {
         country: _selectedCountryIso!,
         otpCode: _otpRequired ? _otpCtrl.text.trim() : null,
       );
-      setState(() { _submitted = true; });
+      setState(() {
+        _submitted = true;
+      });
     } catch (e) {
       String msg = 'Erreur lors du paiement. Réessayez.';
       if (e is DioException) {
@@ -498,9 +578,13 @@ class _PaymentSheetState extends State<_PaymentSheet> {
             : null;
         if (backendMsg != null && backendMsg.isNotEmpty) msg = backendMsg;
       }
-      setState(() { _error = msg; });
+      setState(() {
+        _error = msg;
+      });
     } finally {
-      setState(() { _submitting = false; });
+      setState(() {
+        _submitting = false;
+      });
     }
   }
 
@@ -513,7 +597,8 @@ class _PaymentSheetState extends State<_PaymentSheet> {
         top: AppSpacing.md,
         bottom: MediaQuery.of(context).viewInsets.bottom + AppSpacing.md,
       ),
-      child: _submitted ? _buildSuccessState(context) : _buildFormState(context),
+      child:
+          _submitted ? _buildSuccessState(context) : _buildFormState(context),
     );
   }
 
@@ -564,7 +649,8 @@ class _PaymentSheetState extends State<_PaymentSheet> {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
-                _error ?? 'Aucun opérateur disponible pour le moment. Réessayez plus tard.',
+                _error ??
+                    'Aucun opérateur disponible pour le moment. Réessayez plus tard.',
                 style: AppTextStyles.caption.copyWith(color: AppColors.error),
               ),
             )
@@ -620,12 +706,14 @@ class _PaymentSheetState extends State<_PaymentSheet> {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.info_outline, size: 14, color: AppColors.accent),
+                  const Icon(Icons.info_outline,
+                      size: 14, color: AppColors.accent),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
                       'N\'oubliez pas l\'indicatif de ce pays au début du numéro, sinon le paiement échouera.',
-                      style: AppTextStyles.caption.copyWith(color: AppColors.accent),
+                      style: AppTextStyles.caption
+                          .copyWith(color: AppColors.accent),
                     ),
                   ),
                 ],
@@ -641,7 +729,8 @@ class _PaymentSheetState extends State<_PaymentSheet> {
                     ),
                     child: Text(
                       'Orange Money et Moov Money ne sont pas encore disponibles pour ce pays.',
-                      style: AppTextStyles.caption.copyWith(color: AppColors.error),
+                      style: AppTextStyles.caption
+                          .copyWith(color: AppColors.error),
                     ),
                   )
                 : DropdownButtonFormField<String>(
@@ -656,7 +745,8 @@ class _PaymentSheetState extends State<_PaymentSheet> {
                       return DropdownMenuItem(value: code, child: Text(name));
                     }).toList(),
                     onChanged: (v) => setState(() => _selectedOperator = v),
-                    validator: (v) => v == null ? 'Choisissez un opérateur' : null,
+                    validator: (v) =>
+                        v == null ? 'Choisissez un opérateur' : null,
                   ),
             if (_otpRequired) ...[
               const SizedBox(height: 12),
@@ -667,9 +757,10 @@ class _PaymentSheetState extends State<_PaymentSheet> {
                   labelText: 'Code OTP reçu par SMS *',
                   prefixIcon: Icon(Icons.sms_outlined),
                 ),
-                validator: (v) => (_otpRequired && (v == null || v.trim().isEmpty))
-                    ? 'Code requis pour cet opérateur'
-                    : null,
+                validator: (v) =>
+                    (_otpRequired && (v == null || v.trim().isEmpty))
+                        ? 'Code requis pour cet opérateur'
+                        : null,
               ),
             ],
           ],
@@ -683,7 +774,9 @@ class _PaymentSheetState extends State<_PaymentSheet> {
             child: AppButton(
               label: 'Payer maintenant',
               isLoading: _submitting,
-              onPressed: (_submitting || _operatorsForCountry.isEmpty) ? null : _submit,
+              onPressed: (_submitting || _operatorsForCountry.isEmpty)
+                  ? null
+                  : _submit,
             ),
           ),
         ],

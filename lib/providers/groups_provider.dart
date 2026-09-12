@@ -34,7 +34,8 @@ final groupsProvider = FutureProvider.autoDispose<List<Group>>((ref) async {
 /// Séparé de `groupsProvider` : les deux se rafraîchissent indépendamment,
 /// et un échec de cet appel ne doit pas empêcher d'afficher les groupes
 /// (voir le try/catch silencieux — comportement identique à l'ancien code).
-final dashboardProvider = FutureProvider.autoDispose<Map<String, dynamic>?>((ref) async {
+final dashboardProvider =
+    FutureProvider.autoDispose<Map<String, dynamic>?>((ref) async {
   try {
     final res = await ApiService().dio.get('/groups/dashboard/summary');
     return res.data['data'] as Map<String, dynamic>?;

@@ -35,21 +35,34 @@ class _MemberLoginScreenState extends State<MemberLoginScreen> {
       setState(() => _errorMsg = 'Entrez votre numéro');
       return;
     }
-    setState(() { _loading = true; _errorMsg = ''; });
+    setState(() {
+      _loading = true;
+      _errorMsg = '';
+    });
     try {
       await _authService.memberLoginRequestOTP(_fullPhone);
-      setState(() { _otpSent = true; _resendCountdown = 60; });
+      setState(() {
+        _otpSent = true;
+        _resendCountdown = 60;
+      });
       _startCountdown();
     } catch (e) {
-      setState(() { _errorMsg = _parseError(e); });
+      setState(() {
+        _errorMsg = _parseError(e);
+      });
     } finally {
-      setState(() { _loading = false; });
+      setState(() {
+        _loading = false;
+      });
     }
   }
 
   Future<void> _verifyOTP() async {
     if (_otp.length < 6) return;
-    setState(() { _loading = true; _errorMsg = ''; });
+    setState(() {
+      _loading = true;
+      _errorMsg = '';
+    });
     try {
       final data = await _authService.memberLoginVerify(
         phone: _fullPhone,
@@ -65,7 +78,9 @@ class _MemberLoginScreenState extends State<MemberLoginScreen> {
         if (!mounted) return;
         final chosen = await _pickSpace(spaces);
         if (chosen == null) {
-          setState(() { _loading = false; });
+          setState(() {
+            _loading = false;
+          });
           return;
         }
         final selected = await _authService.memberLoginSelectSpace(
@@ -78,9 +93,13 @@ class _MemberLoginScreenState extends State<MemberLoginScreen> {
 
       await _completeLogin(payload);
     } catch (e) {
-      setState(() { _errorMsg = _parseError(e); });
+      setState(() {
+        _errorMsg = _parseError(e);
+      });
     } finally {
-      setState(() { _loading = false; });
+      setState(() {
+        _loading = false;
+      });
     }
   }
 
@@ -103,8 +122,7 @@ class _MemberLoginScreenState extends State<MemberLoginScreen> {
 
   /// Affiche la liste des "espaces" (un par gérant) et retourne celui choisi,
   /// ou null si l'utilisateur annule.
-  Future<Map<String, dynamic>?> _pickSpace(
-      List<Map<String, dynamic>> spaces) {
+  Future<Map<String, dynamic>?> _pickSpace(List<Map<String, dynamic>> spaces) {
     return showModalBottomSheet<Map<String, dynamic>>(
       context: context,
       isScrollControlled: true,
@@ -118,7 +136,8 @@ class _MemberLoginScreenState extends State<MemberLoginScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Vous avez plusieurs comptes', style: AppTextStyles.h3),
+              const Text('Vous avez plusieurs comptes',
+                  style: AppTextStyles.h3),
               const SizedBox(height: 4),
               const Text(
                 'Ce numéro est membre chez plusieurs gérants. Choisissez le compte à ouvrir.',
@@ -129,7 +148,8 @@ class _MemberLoginScreenState extends State<MemberLoginScreen> {
                     contentPadding: EdgeInsets.zero,
                     leading: const CircleAvatar(
                       backgroundColor: AppColors.primarySurface,
-                      child: Icon(Icons.groups_outlined, color: AppColors.primary),
+                      child:
+                          Icon(Icons.groups_outlined, color: AppColors.primary),
                     ),
                     title: Text(s['tenantName'] as String),
                     trailing: const Icon(Icons.chevron_right),
@@ -146,7 +166,9 @@ class _MemberLoginScreenState extends State<MemberLoginScreen> {
     Future.doWhile(() async {
       await Future.delayed(const Duration(seconds: 1));
       if (!mounted) return false;
-      setState(() { _resendCountdown--; });
+      setState(() {
+        _resendCountdown--;
+      });
       return _resendCountdown > 0;
     });
   }
@@ -190,7 +212,6 @@ class _MemberLoginScreenState extends State<MemberLoginScreen> {
               style: AppTextStyles.caption,
             ),
             const SizedBox(height: AppSpacing.xl),
-
             if (!_otpSent) ...[
               Row(
                 children: [
@@ -286,7 +307,6 @@ class _MemberLoginScreenState extends State<MemberLoginScreen> {
                       ),
               ),
             ],
-
             const SizedBox(height: AppSpacing.lg),
             Center(
               child: TextButton(
@@ -317,13 +337,11 @@ class _MemberLoginScreenState extends State<MemberLoginScreen> {
         ),
         child: Row(
           children: [
-            const Icon(Icons.error_outline,
-                color: AppColors.error, size: 18),
+            const Icon(Icons.error_outline, color: AppColors.error, size: 18),
             const SizedBox(width: 8),
             Expanded(
               child: Text(_errorMsg,
-                  style: const TextStyle(
-                      color: AppColors.error, fontSize: 13)),
+                  style: const TextStyle(color: AppColors.error, fontSize: 13)),
             ),
           ],
         ),

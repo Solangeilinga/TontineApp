@@ -36,7 +36,8 @@ class Contribution {
         status: json['status'],
         amount: (json['amount'] as num).toDouble(),
         dueDate: DateTime.parse(json['dueDate']),
-        paidDate: json['paidDate'] != null ? DateTime.parse(json['paidDate']) : null,
+        paidDate:
+            json['paidDate'] != null ? DateTime.parse(json['paidDate']) : null,
         note: json['note'],
         user: json['user'] != null ? Member.fromJson(json['user']) : null,
         serverIsLate: json['isLate'] ?? false,

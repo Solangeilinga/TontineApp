@@ -41,7 +41,9 @@ class _MembreGroupDetailScreenState extends State<MembreGroupDetailScreen>
   }
 
   Future<void> _load() async {
-    setState(() { _loading = true; });
+    setState(() {
+      _loading = true;
+    });
     try {
       final turns = await _groupService.getMemberTurns(widget.groupId);
       final contribs =
@@ -58,7 +60,9 @@ class _MembreGroupDetailScreenState extends State<MembreGroupDetailScreen>
       });
     } catch (_) {
     } finally {
-      setState(() { _loading = false; });
+      setState(() {
+        _loading = false;
+      });
     }
   }
 
@@ -85,8 +89,9 @@ class _MembreGroupDetailScreenState extends State<MembreGroupDetailScreen>
   // ── Date programmée réelle de mon propre tour (calculée côté serveur)
   DateTime? get _myScheduledDate {
     final list = _turns?['turns'] as List? ?? [];
-    final mine = list.cast<Map<String, dynamic>>().where(
-        (t) => t['turnNumber'] == _myTurn);
+    final mine = list
+        .cast<Map<String, dynamic>>()
+        .where((t) => t['turnNumber'] == _myTurn);
     if (mine.isEmpty) return null;
     return DateTime.parse(mine.first['scheduledDate']);
   }
@@ -177,10 +182,8 @@ class _MyTurnTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final total = members.length;
-    final membersAfterMe =
-        members.where((m) => m.orderTurn > myTurn).length;
-    final membersBeforeMe =
-        members.where((m) => m.orderTurn < myTurn).length;
+    final membersAfterMe = members.where((m) => m.orderTurn > myTurn).length;
+    final membersBeforeMe = members.where((m) => m.orderTurn < myTurn).length;
     final hasReceived = receivedTurnNumbers.contains(myTurn);
 
     return SingleChildScrollView(
@@ -313,8 +316,7 @@ class _MyTurnTab extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text('Total collecte',
-                          style: AppTextStyles.body),
+                      const Text('Total collecte', style: AppTextStyles.body),
                       Text(
                         Formatters.amount(
                           (recap!['recap']['totalReceived'] as num).toDouble(),
@@ -433,17 +435,25 @@ class _EstimatedDateCard extends StatelessWidget {
 
   String _formatDate(DateTime date) {
     const months = [
-      'janvier', 'fevrier', 'mars', 'avril', 'mai', 'juin',
-      'juillet', 'aout', 'septembre', 'octobre', 'novembre', 'decembre'
+      'janvier',
+      'fevrier',
+      'mars',
+      'avril',
+      'mai',
+      'juin',
+      'juillet',
+      'aout',
+      'septembre',
+      'octobre',
+      'novembre',
+      'decembre'
     ];
     return '${date.day} ${months[date.month - 1]} ${date.year}';
   }
 
   @override
   Widget build(BuildContext context) {
-    final membersBeforeMe = members
-        .where((m) => m.orderTurn < myTurn)
-        .toList()
+    final membersBeforeMe = members.where((m) => m.orderTurn < myTurn).toList()
       ..sort((a, b) => a.orderTurn.compareTo(b.orderTurn));
 
     final turnsToWait = membersBeforeMe.length;
@@ -567,8 +577,7 @@ class _MembersListTab extends StatelessWidget {
           ),
           child: ListTile(
             leading: CircleAvatar(
-              backgroundColor:
-                  isMe ? AppColors.primary : AppColors.surfaceAlt,
+              backgroundColor: isMe ? AppColors.primary : AppColors.surfaceAlt,
               child: Text(
                 '${m.orderTurn}',
                 style: TextStyle(
@@ -582,18 +591,15 @@ class _MembersListTab extends StatelessWidget {
                 Text(
                   m.user.name,
                   style: TextStyle(
-                    fontWeight:
-                        isMe ? FontWeight.w700 : FontWeight.w500,
-                    color: isMe
-                        ? AppColors.primary
-                        : AppColors.textPrimary,
+                    fontWeight: isMe ? FontWeight.w700 : FontWeight.w500,
+                    color: isMe ? AppColors.primary : AppColors.textPrimary,
                   ),
                 ),
                 if (isMe) ...[
                   const SizedBox(width: 8),
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 8, vertical: 2),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
                       color: AppColors.primary,
                       borderRadius: BorderRadius.circular(20),
@@ -624,8 +630,8 @@ class _MembersListTab extends StatelessWidget {
             ),
             trailing: hasReceived
                 ? Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
                       color: AppColors.success.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20),
@@ -687,22 +693,30 @@ class _MyContributionsTabState extends State<_MyContributionsTab> {
 
   Color _statusColor(String status) {
     switch (status) {
-      case 'RECEIVED': return AppColors.success;
-      case 'LATE': return AppColors.error;
-      default: return AppColors.warning;
+      case 'RECEIVED':
+        return AppColors.success;
+      case 'LATE':
+        return AppColors.error;
+      default:
+        return AppColors.warning;
     }
   }
 
   IconData _statusIcon(String status) {
     switch (status) {
-      case 'RECEIVED': return Icons.check_circle_outline;
-      case 'LATE': return Icons.warning_outlined;
-      default: return Icons.hourglass_empty;
+      case 'RECEIVED':
+        return Icons.check_circle_outline;
+      case 'LATE':
+        return Icons.warning_outlined;
+      default:
+        return Icons.hourglass_empty;
     }
   }
 
   Future<void> _hide(Contribution c, int index) async {
-    setState(() { _localContribs.removeAt(index); });
+    setState(() {
+      _localContribs.removeAt(index);
+    });
     try {
       await widget.groupService.hideMemberContribution(
         groupId: widget.groupId,
@@ -710,7 +724,9 @@ class _MyContributionsTabState extends State<_MyContributionsTab> {
       );
     } catch (_) {
       if (mounted) {
-        setState(() { _localContribs.insert(index, c); });
+        setState(() {
+          _localContribs.insert(index, c);
+        });
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Erreur, réessayez.')),
         );
@@ -727,11 +743,9 @@ class _MyContributionsTabState extends State<_MyContributionsTab> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.payments_outlined,
-                size: 56, color: AppColors.textHint),
+            Icon(Icons.payments_outlined, size: 56, color: AppColors.textHint),
             SizedBox(height: AppSpacing.md),
-            Text('Aucune cotisation pour l\'instant',
-                style: AppTextStyles.h4),
+            Text('Aucune cotisation pour l\'instant', style: AppTextStyles.h4),
             SizedBox(height: AppSpacing.sm),
             Text(
               'Vos cotisations apparaitront ici\nquand le gerant creera un cycle',
@@ -877,8 +891,8 @@ class _MyContributionsTabState extends State<_MyContributionsTab> {
                   ],
                 ),
                 trailing: Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 10, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
                     color: _statusColor(c.status).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(20),

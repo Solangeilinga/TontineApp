@@ -59,16 +59,20 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
         ? '1'
         : _frequencyValueCtrl.text.trim();
     final unit = {
-      'DAYS': 'jour(s)',
-      'WEEKS': 'semaine(s)',
-      'MONTHS': 'mois',
-    }[_frequencyUnit] ?? 'mois';
+          'DAYS': 'jour(s)',
+          'WEEKS': 'semaine(s)',
+          'MONTHS': 'mois',
+        }[_frequencyUnit] ??
+        'mois';
     return 'Tous les $val $unit';
   }
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
-    setState(() { _loading = true; _errorMsg = ''; });
+    setState(() {
+      _loading = true;
+      _errorMsg = '';
+    });
 
     final userDesc = _descCtrl.text.trim();
 
@@ -97,10 +101,16 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
       }
     } catch (e) {
       String msg = 'Erreur. Réessayez.';
-      try { msg = (e as dynamic).response?.data?['message'] ?? msg; } catch (_) {}
-      setState(() { _errorMsg = msg; });
+      try {
+        msg = (e as dynamic).response?.data?['message'] ?? msg;
+      } catch (_) {}
+      setState(() {
+        _errorMsg = msg;
+      });
     } finally {
-      setState(() { _loading = false; });
+      setState(() {
+        _loading = false;
+      });
     }
   }
 
@@ -149,7 +159,8 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
               const SizedBox(height: AppSpacing.md),
 
               // Fréquence
-              const Text('Fréquence de cotisation *', style: AppTextStyles.label),
+              const Text('Fréquence de cotisation *',
+                  style: AppTextStyles.label),
               const SizedBox(height: AppSpacing.sm),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -187,7 +198,8 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
                       ),
                       items: const [
                         DropdownMenuItem(value: 'DAYS', child: Text('Jours')),
-                        DropdownMenuItem(value: 'WEEKS', child: Text('Semaines')),
+                        DropdownMenuItem(
+                            value: 'WEEKS', child: Text('Semaines')),
                         DropdownMenuItem(value: 'MONTHS', child: Text('Mois')),
                       ],
                       onChanged: (v) => setState(() => _frequencyUnit = v!),
@@ -197,7 +209,8 @@ class _EditGroupScreenState extends State<EditGroupScreen> {
               ),
               const SizedBox(height: AppSpacing.sm),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
                   color: AppColors.accentLight,
                   borderRadius: BorderRadius.circular(8),

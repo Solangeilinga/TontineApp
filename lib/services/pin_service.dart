@@ -113,9 +113,8 @@ class PinService {
 
   // ── Sauvegarder PIN via API + cache local
   Future<void> savePin(String pin, String userType) async {
-    final endpoint = userType == 'tenant'
-        ? '/auth/tenant/pin/set'
-        : '/auth/member/pin/set';
+    final endpoint =
+        userType == 'tenant' ? '/auth/tenant/pin/set' : '/auth/member/pin/set';
     await _api.dio.post(endpoint, data: {'pin': pin});
     await _storage.write(key: _pinSetKey, value: 'true');
   }

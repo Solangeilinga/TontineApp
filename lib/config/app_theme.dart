@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 
 class AppColors {
   // Palette principale — vert tontine africaine
-  static const primary = Color(0xFF1B6B3A);       // Vert profond
-  static const primaryLight = Color(0xFF2E8B57);   // Vert clair
+  static const primary = Color(0xFF1B6B3A); // Vert profond
+  static const primaryLight = Color(0xFF2E8B57); // Vert clair
   static const primarySurface = Color(0xFFE8F5EE); // Fond vert très clair
-  static const accent = Color(0xFFE8A838);          // Or/Ambre africain
-  static const accentLight = Color(0xFFFFF3DC);     // Fond doré clair
+  static const accent = Color(0xFFE8A838); // Or/Ambre africain
+  static const accentLight = Color(0xFFFFF3DC); // Fond doré clair
 
   // Neutres
   static const background = Color(0xFFF8F9FA);
@@ -119,9 +119,11 @@ class AppTheme {
             borderRadius: BorderRadius.circular(12),
             borderSide: const BorderSide(color: AppColors.error),
           ),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           hintStyle: const TextStyle(color: AppColors.textHint, fontSize: 14),
-          labelStyle: const TextStyle(color: AppColors.textSecondary, fontSize: 14),
+          labelStyle:
+              const TextStyle(color: AppColors.textSecondary, fontSize: 14),
         ),
 
         // Cards
@@ -156,14 +158,26 @@ class AppTheme {
 
 // Extensions de style texte
 class AppTextStyles {
-  static const h1 = TextStyle(fontSize: 28, fontWeight: FontWeight.w700, color: AppColors.textPrimary);
-  static const h2 = TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: AppColors.textPrimary);
-  static const h3 = TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textPrimary);
-  static const h4 = TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary);
-  static const body = TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: AppColors.textPrimary);
-  static const bodyMedium = TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.textPrimary);
-  static const caption = TextStyle(fontSize: 12, fontWeight: FontWeight.w400, color: AppColors.textSecondary);
-  static const label = TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: AppColors.textSecondary);
+  static const h1 = TextStyle(
+      fontSize: 28, fontWeight: FontWeight.w700, color: AppColors.textPrimary);
+  static const h2 = TextStyle(
+      fontSize: 22, fontWeight: FontWeight.w700, color: AppColors.textPrimary);
+  static const h3 = TextStyle(
+      fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textPrimary);
+  static const h4 = TextStyle(
+      fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.textPrimary);
+  static const body = TextStyle(
+      fontSize: 14, fontWeight: FontWeight.w400, color: AppColors.textPrimary);
+  static const bodyMedium = TextStyle(
+      fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.textPrimary);
+  static const caption = TextStyle(
+      fontSize: 12,
+      fontWeight: FontWeight.w400,
+      color: AppColors.textSecondary);
+  static const label = TextStyle(
+      fontSize: 13,
+      fontWeight: FontWeight.w500,
+      color: AppColors.textSecondary);
 }
 
 class AppSpacing {

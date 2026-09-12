@@ -46,14 +46,22 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
 
   Future<void> _loadDetail() async {
     if (!mounted) return;
-    setState(() { _loading = true; });
+    setState(() {
+      _loading = true;
+    });
     try {
       final detail = await _groupService.getGroupDetail(widget.groupId);
       if (!mounted) return;
-      setState(() { _detail = detail; });
+      setState(() {
+        _detail = detail;
+      });
     } catch (_) {
     } finally {
-      if (mounted) setState(() { _loading = false; });
+      if (mounted) {
+        setState(() {
+          _loading = false;
+        });
+      }
     }
   }
 
@@ -121,21 +129,28 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
 
     final StringBuffer msg = StringBuffer();
     msg.writeln('Recapitulatif — ${group.name}');
-    msg.writeln('Date : ${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}');
+    msg.writeln(
+        'Date : ${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}');
     msg.writeln('');
-    msg.writeln('Montant/membre : ${Formatters.amount(group.amount, group.currency)}');
-    msg.writeln('Recues : ${recapData['receivedCount']}/${recapData['totalMembers']}');
+    msg.writeln(
+        'Montant/membre : ${Formatters.amount(group.amount, group.currency)}');
+    msg.writeln(
+        'Recues : ${recapData['receivedCount']}/${recapData['totalMembers']}');
     msg.writeln('En attente : ${recapData['pendingCount']}');
     msg.writeln('En retard : ${recapData['lateCount']}');
-    msg.writeln('Collecte : ${Formatters.amount((recapData['totalReceived'] as num).toDouble(), group.currency)}');
+    msg.writeln(
+        'Collecte : ${Formatters.amount((recapData['totalReceived'] as num).toDouble(), group.currency)}');
     msg.writeln('');
     msg.writeln('Detail par membre :');
 
     for (final c in contribs) {
       final name = c['user']?['name'] ?? 'Inconnu';
       final status = c['status'];
-      final label = status == 'RECEIVED' ? '[Paye]'
-          : status == 'LATE' ? '[Retard]' : '[Attente]';
+      final label = status == 'RECEIVED'
+          ? '[Paye]'
+          : status == 'LATE'
+              ? '[Retard]'
+              : '[Attente]';
       msg.writeln('$label $name');
     }
 
@@ -165,7 +180,8 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Archiver le groupe ?'),
-        content: const Text('Le groupe ne sera plus actif. Les données sont conservées.'),
+        content: const Text(
+            'Le groupe ne sera plus actif. Les données sont conservées.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
@@ -267,8 +283,12 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
                 ),
             ],
             onSelected: (v) {
-              if (v == 'edit') context.go('/gerant/groups/${widget.groupId}/edit');
-              if (v == 'audit_log') context.push('/gerant/groups/${widget.groupId}/audit-log');
+              if (v == 'edit') {
+                context.go('/gerant/groups/${widget.groupId}/edit');
+              }
+              if (v == 'audit_log') {
+                context.push('/gerant/groups/${widget.groupId}/audit-log');
+              }
               if (v == 'archive') _archiveGroup();
               if (v == 'unarchive') _unarchiveGroup();
             },
@@ -326,16 +346,19 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
                   decoration: BoxDecoration(
                     color: AppColors.primarySurface,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
+                    border: Border.all(
+                        color: AppColors.primary.withValues(alpha: 0.2)),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
                         children: [
-                          const Icon(Icons.link, color: AppColors.primary, size: 16),
+                          const Icon(Icons.link,
+                              color: AppColors.primary, size: 16),
                           const SizedBox(width: 6),
-                          const Text('Code d\'invitation', style: AppTextStyles.label),
+                          const Text('Code d\'invitation',
+                              style: AppTextStyles.label),
                           const Spacer(),
                           if (group.isFull)
                             _statusBadge('Complet', AppColors.error),
@@ -381,7 +404,8 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
                               child: const Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(Icons.share, color: Colors.white, size: 14),
+                                  Icon(Icons.share,
+                                      color: Colors.white, size: 14),
                                   SizedBox(width: 4),
                                   Text('WhatsApp',
                                       style: TextStyle(
@@ -400,10 +424,13 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
                         ClipRRect(
                           borderRadius: BorderRadius.circular(4),
                           child: LinearProgressIndicator(
-                            value: ((group.memberCount ?? 0) / group.maxMembers!)
-                                .clamp(0.0, 1.0),
+                            value:
+                                ((group.memberCount ?? 0) / group.maxMembers!)
+                                    .clamp(0.0, 1.0),
                             backgroundColor: AppColors.border,
-                            color: group.isFull ? AppColors.error : AppColors.primary,
+                            color: group.isFull
+                                ? AppColors.error
+                                : AppColors.primary,
                             minHeight: 6,
                           ),
                         ),
@@ -540,7 +567,9 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setModalState) => Padding(
           padding: EdgeInsets.fromLTRB(
-            AppSpacing.lg, AppSpacing.lg, AppSpacing.lg,
+            AppSpacing.lg,
+            AppSpacing.lg,
+            AppSpacing.lg,
             MediaQuery.of(ctx).viewInsets.bottom + AppSpacing.lg,
           ),
           child: Column(
@@ -580,7 +609,8 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
                     child: TextField(
                       controller: phoneCtrl,
                       keyboardType: TextInputType.phone,
-                      decoration: const InputDecoration(hintText: '70 00 00 01'),
+                      decoration:
+                          const InputDecoration(hintText: '70 00 00 01'),
                     ),
                   ),
                 ],
@@ -588,7 +618,8 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
               if (errorMsg.isNotEmpty) ...[
                 const SizedBox(height: AppSpacing.sm),
                 Text(errorMsg,
-                    style: const TextStyle(color: AppColors.error, fontSize: 13)),
+                    style:
+                        const TextStyle(color: AppColors.error, fontSize: 13)),
               ],
               const SizedBox(height: AppSpacing.lg),
               AppButton(
@@ -600,7 +631,10 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
                     setModalState(() => errorMsg = 'Nom et telephone requis');
                     return;
                   }
-                  setModalState(() { loading = true; errorMsg = ''; });
+                  setModalState(() {
+                    loading = true;
+                    errorMsg = '';
+                  });
                   try {
                     await _groupService.addMember(
                       groupId: widget.groupId,
@@ -622,7 +656,10 @@ class _GroupDetailScreenState extends State<GroupDetailScreen>
                     try {
                       msg = (e as dynamic).response?.data?['message'] ?? msg;
                     } catch (_) {}
-                    setModalState(() { loading = false; errorMsg = msg; });
+                    setModalState(() {
+                      loading = false;
+                      errorMsg = msg;
+                    });
                   }
                 },
               ),
@@ -652,8 +689,8 @@ class _MembersTab extends StatelessWidget {
 
   void _showEditMemberSheet(BuildContext context, GroupMember m) {
     final nameCtrl = TextEditingController(text: m.user.name);
-    final phoneCtrl = TextEditingController(
-        text: m.user.phone.replaceAll('+226', ''));
+    final phoneCtrl =
+        TextEditingController(text: m.user.phone.replaceAll('+226', ''));
     String countryCode = '+226';
     bool loading = false;
     String errorMsg = '';
@@ -667,7 +704,9 @@ class _MembersTab extends StatelessWidget {
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setModalState) => Padding(
           padding: EdgeInsets.fromLTRB(
-            AppSpacing.lg, AppSpacing.lg, AppSpacing.lg,
+            AppSpacing.lg,
+            AppSpacing.lg,
+            AppSpacing.lg,
             MediaQuery.of(ctx).viewInsets.bottom + AppSpacing.lg,
           ),
           child: Column(
@@ -705,7 +744,8 @@ class _MembersTab extends StatelessWidget {
                     child: TextField(
                       controller: phoneCtrl,
                       keyboardType: TextInputType.phone,
-                      decoration: const InputDecoration(hintText: '70 00 00 01'),
+                      decoration:
+                          const InputDecoration(hintText: '70 00 00 01'),
                     ),
                   ),
                 ],
@@ -713,20 +753,25 @@ class _MembersTab extends StatelessWidget {
               if (errorMsg.isNotEmpty) ...[
                 const SizedBox(height: AppSpacing.sm),
                 Text(errorMsg,
-                    style: const TextStyle(color: AppColors.error, fontSize: 13)),
+                    style:
+                        const TextStyle(color: AppColors.error, fontSize: 13)),
               ],
               const SizedBox(height: AppSpacing.lg),
               AppButton(
                 label: 'Enregistrer',
                 isLoading: loading,
                 onPressed: () async {
-                  setModalState(() { loading = true; errorMsg = ''; });
+                  setModalState(() {
+                    loading = true;
+                    errorMsg = '';
+                  });
                   try {
                     await groupService.updateMember(
                       groupId: groupId,
                       userId: m.userId,
                       name: nameCtrl.text.trim().isEmpty
-                          ? null : nameCtrl.text.trim(),
+                          ? null
+                          : nameCtrl.text.trim(),
                       phone: phoneCtrl.text.trim().isEmpty
                           ? null
                           : '$countryCode${phoneCtrl.text.trim()}',
@@ -746,7 +791,10 @@ class _MembersTab extends StatelessWidget {
                     try {
                       msg = (e as dynamic).response?.data?['message'] ?? msg;
                     } catch (_) {}
-                    setModalState(() { loading = false; errorMsg = msg; });
+                    setModalState(() {
+                      loading = false;
+                      errorMsg = msg;
+                    });
                   }
                 },
               ),
@@ -764,8 +812,7 @@ class _MembersTab extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.people_outline,
-                size: 56, color: AppColors.textHint),
+            Icon(Icons.people_outline, size: 56, color: AppColors.textHint),
             SizedBox(height: AppSpacing.md),
             Text('Aucun membre pour l\'instant', style: AppTextStyles.h4),
             SizedBox(height: AppSpacing.sm),
@@ -804,8 +851,8 @@ class _MembersTab extends StatelessWidget {
               ),
             ),
             title: Text(m.user.name, style: AppTextStyles.bodyMedium),
-            subtitle: Text(
-                Formatters.phone(m.user.phone), style: AppTextStyles.caption),
+            subtitle: Text(Formatters.phone(m.user.phone),
+                style: AppTextStyles.caption),
             trailing: PopupMenuButton(
               itemBuilder: (_) => const [
                 PopupMenuItem(
@@ -822,8 +869,7 @@ class _MembersTab extends StatelessWidget {
                     Icon(Icons.remove_circle_outline,
                         color: AppColors.error, size: 16),
                     SizedBox(width: 8),
-                    Text('Retirer',
-                        style: TextStyle(color: AppColors.error)),
+                    Text('Retirer', style: TextStyle(color: AppColors.error)),
                   ]),
                 ),
               ],
@@ -894,17 +940,24 @@ class _ContributionsTabState extends State<_ContributionsTab> {
 
   Future<void> _load() async {
     if (!mounted) return;
-    setState(() { _loading = true; });
+    setState(() {
+      _loading = true;
+    });
     try {
-      final list =
-          await widget.groupService.getContributions(widget.groupId);
-      final recap =
-          await widget.groupService.getCycleRecap(widget.groupId);
+      final list = await widget.groupService.getContributions(widget.groupId);
+      final recap = await widget.groupService.getCycleRecap(widget.groupId);
       if (!mounted) return;
-      setState(() { _contribs = list; _recap = recap; });
+      setState(() {
+        _contribs = list;
+        _recap = recap;
+      });
     } catch (_) {
     } finally {
-      if (mounted) setState(() { _loading = false; });
+      if (mounted) {
+        setState(() {
+          _loading = false;
+        });
+      }
     }
   }
 
@@ -920,9 +973,12 @@ class _ContributionsTabState extends State<_ContributionsTab> {
 
   Color _statusColor(String status) {
     switch (status) {
-      case 'RECEIVED': return AppColors.success;
-      case 'LATE': return AppColors.error;
-      default: return AppColors.warning;
+      case 'RECEIVED':
+        return AppColors.success;
+      case 'LATE':
+        return AppColors.error;
+      default:
+        return AppColors.warning;
     }
   }
 
@@ -1007,7 +1063,6 @@ class _ContributionsTabState extends State<_ContributionsTab> {
             ],
           ),
           const SizedBox(height: AppSpacing.md),
-
           if (_recap != null && _recap!['recap'] != null) ...[
             Container(
               padding: const EdgeInsets.all(AppSpacing.md),
@@ -1098,7 +1153,6 @@ class _ContributionsTabState extends State<_ContributionsTab> {
             ),
             const SizedBox(height: AppSpacing.md),
           ],
-
           ..._contribs.map((c) => Container(
                 margin: const EdgeInsets.only(bottom: 8),
                 decoration: BoxDecoration(
@@ -1111,8 +1165,8 @@ class _ContributionsTabState extends State<_ContributionsTab> {
                   ),
                 ),
                 child: ListTile(
-                  title: Text(c.user?.name ?? '',
-                      style: AppTextStyles.bodyMedium),
+                  title:
+                      Text(c.user?.name ?? '', style: AppTextStyles.bodyMedium),
                   subtitle: Text(
                     'Tour N°${c.roundNumber} — Echeance : ${Formatters.date(c.dueDate)}',
                     style: AppTextStyles.caption,
@@ -1124,7 +1178,9 @@ class _ContributionsTabState extends State<_ContributionsTab> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
-                          color: (c.isLate ? AppColors.error : _statusColor(c.status))
+                          color: (c.isLate
+                                  ? AppColors.error
+                                  : _statusColor(c.status))
                               .withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(20),
                         ),
@@ -1133,7 +1189,9 @@ class _ContributionsTabState extends State<_ContributionsTab> {
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
-                            color: c.isLate ? AppColors.error : _statusColor(c.status),
+                            color: c.isLate
+                                ? AppColors.error
+                                : _statusColor(c.status),
                           ),
                         ),
                       ),
@@ -1188,7 +1246,9 @@ class _ContributionsTabState extends State<_ContributionsTab> {
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setModalState) => Padding(
           padding: EdgeInsets.fromLTRB(
-            AppSpacing.lg, AppSpacing.lg, AppSpacing.lg,
+            AppSpacing.lg,
+            AppSpacing.lg,
+            AppSpacing.lg,
             MediaQuery.of(ctx).viewInsets.bottom + AppSpacing.lg,
           ),
           child: Column(
@@ -1209,8 +1269,8 @@ class _ContributionsTabState extends State<_ContributionsTab> {
                   borderRadius: BorderRadius.circular(12),
                   side: const BorderSide(color: AppColors.border),
                 ),
-                leading: const Icon(Icons.calendar_today,
-                    color: AppColors.primary),
+                leading:
+                    const Icon(Icons.calendar_today, color: AppColors.primary),
                 title: const Text('Date de début'),
                 subtitle: Text(
                   Formatters.date(selected),
@@ -1223,7 +1283,8 @@ class _ContributionsTabState extends State<_ContributionsTab> {
                   final picked = await showDatePicker(
                     context: ctx,
                     initialDate: selected,
-                    firstDate: DateTime.now().subtract(const Duration(days: 30)),
+                    firstDate:
+                        DateTime.now().subtract(const Duration(days: 30)),
                     lastDate: DateTime.now().add(const Duration(days: 365)),
                   );
                   if (picked != null) setModalState(() => selected = picked);
@@ -1300,23 +1361,34 @@ class _TurnsTabState extends State<_TurnsTab> {
 
   Future<void> _load() async {
     if (!mounted) return;
-    setState(() { _loading = true; _error = null; });
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
     try {
-      final res = await widget.apiService.dio
-          .get('/groups/${widget.groupId}/turns');
+      final res =
+          await widget.apiService.dio.get('/groups/${widget.groupId}/turns');
       if (!mounted) return;
       final data = res.data['data'];
       if (data != null) {
-        setState(() { _data = data; });
+        setState(() {
+          _data = data;
+        });
       } else {
-        setState(() { _error = 'Aucune donnée reçue'; });
+        setState(() {
+          _error = 'Aucune donnée reçue';
+        });
       }
     } catch (e) {
       if (!mounted) return;
-      setState(() { _error = 'Erreur de chargement'; });
+      setState(() {
+        _error = 'Erreur de chargement';
+      });
     } finally {
       if (mounted) {
-        setState(() { _loading = false; });
+        setState(() {
+          _loading = false;
+        });
       }
     }
   }
@@ -1325,14 +1397,13 @@ class _TurnsTabState extends State<_TurnsTab> {
     try {
       await widget.apiService.dio.post(
         '/groups/${widget.groupId}/turns/received',
-        data: { 'turnNumber': turn['turnNumber'] },
+        data: {'turnNumber': turn['turnNumber']},
       );
       _load();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-                '${turn['user']['name']} a recu sa mise !'),
+            content: Text('${turn['user']['name']} a recu sa mise !'),
             backgroundColor: AppColors.success,
           ),
         );
@@ -1394,10 +1465,10 @@ class _TurnsTabState extends State<_TurnsTab> {
         content: Text(
           allReceived
               ? 'Tous les membres ont reçu leur mise pour le Cycle N°$cycleNumber. '
-                'Le clôturer permettra de démarrer un nouveau cycle (Cycle N°${cycleNumber + 1}).'
+                  'Le clôturer permettra de démarrer un nouveau cycle (Cycle N°${cycleNumber + 1}).'
               : 'Certains membres n\'ont pas encore reçu leur mise pour le Cycle N°$cycleNumber. '
-                'Clôturer maintenant démarrera un nouveau cycle sans attendre les membres restants. '
-                'Voulez-vous continuer ?',
+                  'Clôturer maintenant démarrera un nouveau cycle sans attendre les membres restants. '
+                  'Voulez-vous continuer ?',
         ),
         actions: [
           TextButton(
@@ -1421,7 +1492,8 @@ class _TurnsTabState extends State<_TurnsTab> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Cycle N°$cycleNumber clôturé. Cycle N°${cycleNumber + 1} démarré.'),
+            content: Text(
+                'Cycle N°$cycleNumber clôturé. Cycle N°${cycleNumber + 1} démarré.'),
             backgroundColor: AppColors.success,
           ),
         );
@@ -1456,8 +1528,7 @@ class _TurnsTabState extends State<_TurnsTab> {
               Navigator.pop(ctx);
               _markReceived(turn);
             },
-            style:
-                ElevatedButton.styleFrom(backgroundColor: AppColors.accent),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.accent),
             child: const Text('Confirmer'),
           ),
         ],
@@ -1479,8 +1550,7 @@ class _TurnsTabState extends State<_TurnsTab> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.wifi_off,
-                size: 48, color: AppColors.textHint),
+            const Icon(Icons.wifi_off, size: 48, color: AppColors.textHint),
             const SizedBox(height: AppSpacing.md),
             Text(_error!, style: AppTextStyles.body),
             const SizedBox(height: AppSpacing.md),
@@ -1495,8 +1565,8 @@ class _TurnsTabState extends State<_TurnsTab> {
     }
 
     // Null safety — cast sécurisé
-    final turns = ((_data?['turns'] as List?) ?? [])
-        .cast<Map<String, dynamic>>();
+    final turns =
+        ((_data?['turns'] as List?) ?? []).cast<Map<String, dynamic>>();
     final receivedCount = (_data?['receivedCount'] as int?) ?? 0;
     final totalMembers = (_data?['totalMembers'] as int?) ?? 0;
     final cycleNumber = _data?['cycleNumber'] as int?;
@@ -1547,8 +1617,8 @@ class _TurnsTabState extends State<_TurnsTab> {
               Text('Cycle N°$cycleNumber', style: AppTextStyles.h3),
               if (allReceived)
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 10, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
                     color: AppColors.success.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(20),
@@ -1580,7 +1650,8 @@ class _TurnsTabState extends State<_TurnsTab> {
               decoration: BoxDecoration(
                 color: AppColors.accent.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: AppColors.accent.withValues(alpha: 0.25)),
+                border:
+                    Border.all(color: AppColors.accent.withValues(alpha: 0.25)),
               ),
               child: Row(
                 children: [
@@ -1638,8 +1709,7 @@ class _TurnsTabState extends State<_TurnsTab> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Remises effectuees',
-                          style: AppTextStyles.h4),
+                      const Text('Remises effectuees', style: AppTextStyles.h4),
                       Text(
                         '$receivedCount / $totalMembers membres ont recu leur mise',
                         style: AppTextStyles.caption,
@@ -1656,11 +1726,9 @@ class _TurnsTabState extends State<_TurnsTab> {
           if (pendingTurns.isNotEmpty) ...[
             const Row(
               children: [
-                Icon(Icons.hourglass_empty,
-                    color: AppColors.warning, size: 18),
+                Icon(Icons.hourglass_empty, color: AppColors.warning, size: 18),
                 SizedBox(width: 6),
-                Text('Calendrier des tours',
-                    style: AppTextStyles.h3),
+                Text('Calendrier des tours', style: AppTextStyles.h3),
               ],
             ),
             const SizedBox(height: AppSpacing.sm),
@@ -1710,8 +1778,7 @@ class _TurnsTabState extends State<_TurnsTab> {
                   title: Text(
                     (t['user'] as Map<String, dynamic>?)?['name'] ?? '',
                     style: TextStyle(
-                      fontWeight:
-                          isNext ? FontWeight.w700 : FontWeight.w500,
+                      fontWeight: isNext ? FontWeight.w700 : FontWeight.w500,
                     ),
                   ),
                   subtitle: Row(
@@ -1758,7 +1825,8 @@ class _TurnsTabState extends State<_TurnsTab> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.edit_calendar_outlined, size: 20),
+                        icon:
+                            const Icon(Icons.edit_calendar_outlined, size: 20),
                         color: AppColors.textSecondary,
                         onPressed: () => _rescheduleTurn(t),
                         tooltip: 'Modifier la date',
@@ -1799,8 +1867,7 @@ class _TurnsTabState extends State<_TurnsTab> {
           if (doneTurns.isNotEmpty) ...[
             const Row(
               children: [
-                Icon(Icons.check_circle,
-                    color: AppColors.success, size: 18),
+                Icon(Icons.check_circle, color: AppColors.success, size: 18),
                 SizedBox(width: 6),
                 Text('Ont deja recu', style: AppTextStyles.h3),
               ],
@@ -1826,7 +1893,8 @@ class _TurnsTabState extends State<_TurnsTab> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            (turn['user'] as Map<String, dynamic>?)?['name'] ?? '',
+                            (turn['user'] as Map<String, dynamic>?)?['name'] ??
+                                '',
                             style: AppTextStyles.bodyMedium,
                           ),
                           Text(
@@ -1891,18 +1959,28 @@ class _ActivityTabState extends State<_ActivityTab> {
 
   Future<void> _load() async {
     if (!mounted) return;
-    setState(() { _loading = true; });
+    setState(() {
+      _loading = true;
+    });
     try {
-      final res = await widget.apiService.dio
-          .get('/groups/${widget.groupId}/activity');
+      final res =
+          await widget.apiService.dio.get('/groups/${widget.groupId}/activity');
       if (!mounted) return;
       setState(() {
         _activities = (res.data['data'] as List?) ?? [];
       });
     } catch (_) {
-      if (mounted) setState(() { _activities = []; });
+      if (mounted) {
+        setState(() {
+          _activities = [];
+        });
+      }
     } finally {
-      if (mounted) setState(() { _loading = false; });
+      if (mounted) {
+        setState(() {
+          _loading = false;
+        });
+      }
     }
   }
 
@@ -1918,7 +1996,9 @@ class _ActivityTabState extends State<_ActivityTab> {
 
   Future<void> _dismiss(Map<String, dynamic> activity, int index) async {
     // ── Suppression optimiste côté UI
-    setState(() { _activities.removeAt(index); });
+    setState(() {
+      _activities.removeAt(index);
+    });
 
     try {
       await widget.groupService.dismissActivity(
@@ -1928,7 +2008,9 @@ class _ActivityTabState extends State<_ActivityTab> {
     } catch (_) {
       // ── En cas d'échec, on la remet dans la liste
       if (mounted) {
-        setState(() { _activities.insert(index, activity); });
+        setState(() {
+          _activities.insert(index, activity);
+        });
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Erreur, réessayez.')),
         );
@@ -1950,11 +2032,9 @@ class _ActivityTabState extends State<_ActivityTab> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.timeline_outlined,
-                size: 56, color: AppColors.textHint),
+            Icon(Icons.timeline_outlined, size: 56, color: AppColors.textHint),
             SizedBox(height: AppSpacing.md),
-            Text('Aucune activite pour l\'instant',
-                style: AppTextStyles.h4),
+            Text('Aucune activite pour l\'instant', style: AppTextStyles.h4),
             SizedBox(height: AppSpacing.sm),
             Text(
               'Les actions dans ce groupe apparaitront ici',

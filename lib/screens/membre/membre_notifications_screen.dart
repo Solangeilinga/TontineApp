@@ -14,8 +14,7 @@ class MembreNotificationsScreen extends StatefulWidget {
       _MembreNotificationsScreenState();
 }
 
-class _MembreNotificationsScreenState
-    extends State<MembreNotificationsScreen> {
+class _MembreNotificationsScreenState extends State<MembreNotificationsScreen> {
   final _api = ApiService();
   List<NotificationModel> _notifs = [];
   bool _loading = true;
@@ -27,7 +26,9 @@ class _MembreNotificationsScreenState
   }
 
   Future<void> _load() async {
-    setState(() { _loading = true; });
+    setState(() {
+      _loading = true;
+    });
     try {
       final res = await _api.dio.get('/notifications');
       final list = res.data['data']['notifications'] as List;
@@ -38,17 +39,23 @@ class _MembreNotificationsScreenState
       await _api.dio.patch('/notifications/read-all');
     } catch (_) {
     } finally {
-      setState(() { _loading = false; });
+      setState(() {
+        _loading = false;
+      });
     }
   }
 
   Future<void> _dismiss(NotificationModel n, int index) async {
-    setState(() { _notifs.removeAt(index); });
+    setState(() {
+      _notifs.removeAt(index);
+    });
     try {
       await _api.dio.delete('/notifications/${n.id}');
     } catch (_) {
       if (mounted) {
-        setState(() { _notifs.insert(index, n); });
+        setState(() {
+          _notifs.insert(index, n);
+        });
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Erreur, réessayez.')),
         );
@@ -59,21 +66,31 @@ class _MembreNotificationsScreenState
   IconData _typeIcon(String type) {
     switch (type) {
       case 'REMINDER_J1':
-      case 'REMINDER_J2': return Icons.alarm;
-      case 'CONTRIBUTION_CONFIRMED': return Icons.check_circle_outline;
-      case 'MEMBER_JOINED': return Icons.person_add_outlined;
-      case 'YOUR_TURN': return Icons.emoji_events_outlined;
-      default: return Icons.notifications_outlined;
+      case 'REMINDER_J2':
+        return Icons.alarm;
+      case 'CONTRIBUTION_CONFIRMED':
+        return Icons.check_circle_outline;
+      case 'MEMBER_JOINED':
+        return Icons.person_add_outlined;
+      case 'YOUR_TURN':
+        return Icons.emoji_events_outlined;
+      default:
+        return Icons.notifications_outlined;
     }
   }
 
   Color _typeColor(String type) {
     switch (type) {
-      case 'REMINDER_J1': return AppColors.error;
-      case 'REMINDER_J2': return AppColors.warning;
-      case 'CONTRIBUTION_CONFIRMED': return AppColors.success;
-      case 'YOUR_TURN': return AppColors.accent;
-      default: return AppColors.primary;
+      case 'REMINDER_J1':
+        return AppColors.error;
+      case 'REMINDER_J2':
+        return AppColors.warning;
+      case 'CONTRIBUTION_CONFIRMED':
+        return AppColors.success;
+      case 'YOUR_TURN':
+        return AppColors.accent;
+      default:
+        return AppColors.primary;
     }
   }
 
@@ -105,8 +122,7 @@ class _MembreNotificationsScreenState
                       Icon(Icons.notifications_off_outlined,
                           size: 56, color: AppColors.textHint),
                       SizedBox(height: AppSpacing.md),
-                      Text('Aucune notification',
-                          style: AppTextStyles.h4),
+                      Text('Aucune notification', style: AppTextStyles.h4),
                       SizedBox(height: AppSpacing.sm),
                       Text(
                         'Vos rappels de cotisation apparaîtront ici',
@@ -120,8 +136,7 @@ class _MembreNotificationsScreenState
                   child: ListView.separated(
                     padding: const EdgeInsets.all(AppSpacing.md),
                     itemCount: _notifs.length,
-                    separatorBuilder: (_, __) =>
-                        const SizedBox(height: 8),
+                    separatorBuilder: (_, __) => const SizedBox(height: 8),
                     itemBuilder: (ctx, i) {
                       final n = _notifs[i];
                       return Dismissible(
@@ -139,64 +154,64 @@ class _MembreNotificationsScreenState
                               color: AppColors.error),
                         ),
                         child: Container(
-                        decoration: BoxDecoration(
-                          color: n.isRead
-                              ? AppColors.surface
-                              : AppColors.primarySurface,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
+                          decoration: BoxDecoration(
                             color: n.isRead
-                                ? AppColors.border
-                                : AppColors.primary.withValues(alpha: 0.2),
-                          ),
-                        ),
-                        child: ListTile(
-                          leading: Container(
-                            width: 42,
-                            height: 42,
-                            decoration: BoxDecoration(
-                              color: _typeColor(n.type).withValues(alpha: 0.1),
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              _typeIcon(n.type),
-                              color: _typeColor(n.type),
-                              size: 20,
+                                ? AppColors.surface
+                                : AppColors.primarySurface,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: n.isRead
+                                  ? AppColors.border
+                                  : AppColors.primary.withValues(alpha: 0.2),
                             ),
                           ),
-                          title: Text(n.title,
-                              style: TextStyle(
-                                fontWeight: n.isRead
-                                    ? FontWeight.w500
-                                    : FontWeight.w700,
-                                fontSize: 14,
-                              )),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(n.message,
-                                  style: AppTextStyles.caption),
-                              const SizedBox(height: 2),
-                              Text(
-                                _timeAgo(n.sentAt),
-                                style: const TextStyle(
-                                  fontSize: 11,
-                                  color: AppColors.textHint,
-                                ),
+                          child: ListTile(
+                            leading: Container(
+                              width: 42,
+                              height: 42,
+                              decoration: BoxDecoration(
+                                color:
+                                    _typeColor(n.type).withValues(alpha: 0.1),
+                                shape: BoxShape.circle,
                               ),
-                            ],
-                          ),
-                          trailing: !n.isRead
-                              ? Container(
-                                  width: 8,
-                                  height: 8,
-                                  decoration: const BoxDecoration(
-                                    color: AppColors.primary,
-                                    shape: BoxShape.circle,
+                              child: Icon(
+                                _typeIcon(n.type),
+                                color: _typeColor(n.type),
+                                size: 20,
+                              ),
+                            ),
+                            title: Text(n.title,
+                                style: TextStyle(
+                                  fontWeight: n.isRead
+                                      ? FontWeight.w500
+                                      : FontWeight.w700,
+                                  fontSize: 14,
+                                )),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(n.message, style: AppTextStyles.caption),
+                                const SizedBox(height: 2),
+                                Text(
+                                  _timeAgo(n.sentAt),
+                                  style: const TextStyle(
+                                    fontSize: 11,
+                                    color: AppColors.textHint,
                                   ),
-                                )
-                              : null,
-                        ),
+                                ),
+                              ],
+                            ),
+                            trailing: !n.isRead
+                                ? Container(
+                                    width: 8,
+                                    height: 8,
+                                    decoration: const BoxDecoration(
+                                      color: AppColors.primary,
+                                      shape: BoxShape.circle,
+                                    ),
+                                  )
+                                : null,
+                          ),
                         ),
                       );
                     },

@@ -46,10 +46,10 @@ Future<void> main() async {
     // Initialiser l'API service
     ApiService().init();
 
-    // Firebase + Push notifications + Crashlytics
+    // Firebase + Crashlytics
     try {
-      await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-      await PushService().init();
+      await Firebase.initializeApp(
+          options: DefaultFirebaseOptions.currentPlatform);
 
       // Crashlytics ne supporte PAS le web du tout (aucune implémentation
       // native pour ce plugin) — l'appeler quand même y lève une
@@ -61,7 +61,8 @@ Future<void> main() async {
         // n'était même pas une dépendance) — un crash en production n'était
         // visible nulle part. Ces deux lignes redirigent toutes les erreurs
         // Flutter (build/layout/paint) vers Crashlytics.
-        FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+        FlutterError.onError =
+            FirebaseCrashlytics.instance.recordFlutterFatalError;
         // Erreurs Dart non gérées en dehors du framework Flutter (isolate
         // racine) — captées par la zone englobante ci-dessous.
         PlatformDispatcher.instance.onError = (error, stack) {
@@ -77,8 +78,24 @@ Future<void> main() async {
       }
     } catch (e) {
       debugPrint('⚠️ Firebase non disponible: $e');
-      // L'app continue sans notifications push ni Crashlytics
+      // L'app continue sans Crashlytics
     }
+
+    // Push notifications : en tâche de fond, jamais sur le chemin critique
+    // du démarrage. `requestPermission()` peut rester indéfiniment pendante
+    // côté navigateur (observé quand Chrome a déjà bloqué la permission
+    // notifications après plusieurs refus) — si elle était `await`ée ici
+    // comme avant, `runApp()` n'était jamais atteint et l'app restait sur
+    // un écran blanc pour toujours, sans la moindre requête réseau ni log.
+    unawaited(
+      PushService().init().timeout(
+        const Duration(seconds: 10),
+        onTimeout: () => debugPrint(
+            '⚠️ Initialisation des notifications push : délai dépassé'),
+      ).catchError((e) {
+        debugPrint('⚠️ Notifications push non disponibles: $e');
+      }),
+    );
 
     // ProviderScope : racine de l'arbre de providers Riverpod. Doit
     // envelopper TOUTE l'app pour que n'importe quel écran puisse lire un
@@ -90,7 +107,8 @@ Future<void> main() async {
     if (!kIsWeb) {
       FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
     } else {
-      debugPrint('❌ Erreur non gérée (web, non remontée à Crashlytics): $error');
+      debugPrint(
+          '❌ Erreur non gérée (web, non remontée à Crashlytics): $error');
     }
   });
 }

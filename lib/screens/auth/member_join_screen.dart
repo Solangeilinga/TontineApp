@@ -41,11 +41,15 @@ class _MemberJoinScreenState extends State<MemberJoinScreen> {
     if (!_formKey.currentState!.validate()) return;
     if (!_acceptedTerms) {
       setState(() {
-        _errorMsg = "Veuillez accepter les conditions d'utilisation pour continuer";
+        _errorMsg =
+            "Veuillez accepter les conditions d'utilisation pour continuer";
       });
       return;
     }
-    setState(() { _loading = true; _errorMsg = ''; });
+    setState(() {
+      _loading = true;
+      _errorMsg = '';
+    });
     try {
       final data = await _authService.memberJoinRequestOTP(
         phone: _fullPhone,
@@ -59,15 +63,22 @@ class _MemberJoinScreenState extends State<MemberJoinScreen> {
       });
       _startCountdown();
     } catch (e) {
-      setState(() { _errorMsg = _parseError(e); });
+      setState(() {
+        _errorMsg = _parseError(e);
+      });
     } finally {
-      setState(() { _loading = false; });
+      setState(() {
+        _loading = false;
+      });
     }
   }
 
   Future<void> _verifyOTP() async {
     if (_otp.length < 6) return;
-    setState(() { _loading = true; _errorMsg = ''; });
+    setState(() {
+      _loading = true;
+      _errorMsg = '';
+    });
     try {
       final data = await _authService.memberJoinVerify(
         phone: _fullPhone,
@@ -86,9 +97,13 @@ class _MemberJoinScreenState extends State<MemberJoinScreen> {
       // ── Nouveau membre → toujours créer un PIN
       if (mounted) context.go('/set-pin/user');
     } catch (e) {
-      setState(() { _errorMsg = _parseError(e); });
+      setState(() {
+        _errorMsg = _parseError(e);
+      });
     } finally {
-      setState(() { _loading = false; });
+      setState(() {
+        _loading = false;
+      });
     }
   }
 
@@ -96,7 +111,9 @@ class _MemberJoinScreenState extends State<MemberJoinScreen> {
     Future.doWhile(() async {
       await Future.delayed(const Duration(seconds: 1));
       if (!mounted) return false;
-      setState(() { _resendCountdown--; });
+      setState(() {
+        _resendCountdown--;
+      });
       return _resendCountdown > 0;
     });
   }
@@ -146,7 +163,6 @@ class _MemberJoinScreenState extends State<MemberJoinScreen> {
                 style: AppTextStyles.caption,
               ),
               const SizedBox(height: AppSpacing.xl),
-
               if (!_otpSent) ...[
                 TextFormField(
                   controller: _nameCtrl,
@@ -229,12 +245,14 @@ class _MemberJoinScreenState extends State<MemberJoinScreen> {
                   decoration: BoxDecoration(
                     color: AppColors.warning.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppColors.warning.withValues(alpha: 0.25)),
+                    border: Border.all(
+                        color: AppColors.warning.withValues(alpha: 0.25)),
                   ),
                   child: const Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(Icons.info_outline, color: AppColors.warning, size: 18),
+                      Icon(Icons.info_outline,
+                          color: AppColors.warning, size: 18),
                       SizedBox(width: 8),
                       Expanded(
                         child: Text(
@@ -332,7 +350,6 @@ class _MemberJoinScreenState extends State<MemberJoinScreen> {
                         ),
                 ),
               ],
-
               const SizedBox(height: AppSpacing.lg),
               Center(
                 child: TextButton(
@@ -364,13 +381,11 @@ class _MemberJoinScreenState extends State<MemberJoinScreen> {
         ),
         child: Row(
           children: [
-            const Icon(Icons.error_outline,
-                color: AppColors.error, size: 18),
+            const Icon(Icons.error_outline, color: AppColors.error, size: 18),
             const SizedBox(width: 8),
             Expanded(
               child: Text(_errorMsg,
-                  style: const TextStyle(
-                      color: AppColors.error, fontSize: 13)),
+                  style: const TextStyle(color: AppColors.error, fontSize: 13)),
             ),
           ],
         ),

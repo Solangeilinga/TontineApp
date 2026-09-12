@@ -33,7 +33,8 @@ class _DeleteAccountSheet extends StatefulWidget {
   final String warningMessage;
   final Future<void> Function(String pin) onConfirm;
 
-  const _DeleteAccountSheet({required this.warningMessage, required this.onConfirm});
+  const _DeleteAccountSheet(
+      {required this.warningMessage, required this.onConfirm});
 
   @override
   State<_DeleteAccountSheet> createState() => _DeleteAccountSheetState();
@@ -55,22 +56,33 @@ class _DeleteAccountSheetState extends State<_DeleteAccountSheet> {
 
   Future<void> _submit() async {
     if (_pinCtrl.text.trim().length != 4) {
-      setState(() { _error = 'Entrez votre PIN à 4 chiffres'; });
+      setState(() {
+        _error = 'Entrez votre PIN à 4 chiffres';
+      });
       return;
     }
-    setState(() { _loading = true; _error = null; });
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
     try {
       await widget.onConfirm(_pinCtrl.text.trim());
       if (mounted) Navigator.pop(context, true);
     } catch (e) {
       String msg = 'Erreur. Réessayez.';
       if (e is DioException) {
-        final backendMsg = e.response?.data is Map ? e.response?.data['message'] as String? : null;
+        final backendMsg = e.response?.data is Map
+            ? e.response?.data['message'] as String?
+            : null;
         if (backendMsg != null && backendMsg.isNotEmpty) msg = backendMsg;
       }
-      setState(() { _error = msg; });
+      setState(() {
+        _error = msg;
+      });
     } finally {
-      setState(() { _loading = false; });
+      setState(() {
+        _loading = false;
+      });
     }
   }
 
@@ -89,7 +101,8 @@ class _DeleteAccountSheetState extends State<_DeleteAccountSheet> {
         children: [
           const Row(
             children: [
-              Icon(Icons.warning_amber_rounded, color: AppColors.error, size: 24),
+              Icon(Icons.warning_amber_rounded,
+                  color: AppColors.error, size: 24),
               SizedBox(width: 8),
               Text('Supprimer le compte', style: AppTextStyles.h3),
             ],
@@ -105,7 +118,8 @@ class _DeleteAccountSheetState extends State<_DeleteAccountSheet> {
             style: AppTextStyles.bodyMedium.copyWith(color: AppColors.error),
           ),
           const SizedBox(height: 16),
-          const Text('Tapez SUPPRIMER pour confirmer', style: AppTextStyles.caption),
+          const Text('Tapez SUPPRIMER pour confirmer',
+              style: AppTextStyles.caption),
           const SizedBox(height: 6),
           TextField(
             controller: _confirmCtrl,
@@ -117,14 +131,16 @@ class _DeleteAccountSheetState extends State<_DeleteAccountSheet> {
           ),
           if (_typedConfirmed) ...[
             const SizedBox(height: 16),
-            const Text('Confirmez avec votre PIN', style: AppTextStyles.caption),
+            const Text('Confirmez avec votre PIN',
+                style: AppTextStyles.caption),
             const SizedBox(height: 6),
             TextField(
               controller: _pinCtrl,
               obscureText: true,
               keyboardType: TextInputType.number,
               maxLength: 4,
-              decoration: const InputDecoration(counterText: '', hintText: '••••'),
+              decoration:
+                  const InputDecoration(counterText: '', hintText: '••••'),
             ),
           ],
           if (_error != null) ...[

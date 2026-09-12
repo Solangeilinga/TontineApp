@@ -27,7 +27,8 @@ class _PwaInstallDialog extends StatelessWidget {
     final isIOS = service.isIOS;
 
     return AlertDialog(
-      icon: const Icon(Icons.add_to_home_screen, color: AppColors.primary, size: 36),
+      icon: const Icon(Icons.add_to_home_screen,
+          color: AppColors.primary, size: 36),
       title: const Text('Installer MaTontine'),
       content: isIOS
           ? const _IOSInstructions()
@@ -81,7 +82,9 @@ class _IOSInstructions extends StatelessWidget {
         SizedBox(height: 12),
         _Step(icon: Icons.ios_share, text: 'Appuie sur le bouton Partager'),
         SizedBox(height: 8),
-        _Step(icon: Icons.add_box_outlined, text: "Choisis « Sur l'écran d'accueil »"),
+        _Step(
+            icon: Icons.add_box_outlined,
+            text: "Choisis « Sur l'écran d'accueil »"),
       ],
     );
   }

@@ -39,28 +39,42 @@ class _TenantRegisterScreenState extends State<TenantRegisterScreen> {
     if (!_formKey.currentState!.validate()) return;
     if (!_acceptedTerms) {
       setState(() {
-        _errorMsg = "Veuillez accepter les conditions d'utilisation pour continuer";
+        _errorMsg =
+            "Veuillez accepter les conditions d'utilisation pour continuer";
       });
       return;
     }
-    setState(() { _loading = true; _errorMsg = ''; });
+    setState(() {
+      _loading = true;
+      _errorMsg = '';
+    });
     try {
       await _authService.tenantRequestOTP(
         phone: _fullPhone,
         name: _nameCtrl.text.trim(),
       );
-      setState(() { _otpSent = true; _resendCountdown = 60; });
+      setState(() {
+        _otpSent = true;
+        _resendCountdown = 60;
+      });
       _startCountdown();
     } catch (e) {
-      setState(() { _errorMsg = _parseError(e); });
+      setState(() {
+        _errorMsg = _parseError(e);
+      });
     } finally {
-      setState(() { _loading = false; });
+      setState(() {
+        _loading = false;
+      });
     }
   }
 
   Future<void> _verifyOTP() async {
     if (_otp.length < 6) return;
-    setState(() { _loading = true; _errorMsg = ''; });
+    setState(() {
+      _loading = true;
+      _errorMsg = '';
+    });
     try {
       final data = await _authService.tenantVerifyAndRegister(
         phone: _fullPhone,
@@ -77,9 +91,13 @@ class _TenantRegisterScreenState extends State<TenantRegisterScreen> {
       // ── Nouveau compte → toujours créer un PIN
       if (mounted) context.go('/set-pin/tenant');
     } catch (e) {
-      setState(() { _errorMsg = _parseError(e); });
+      setState(() {
+        _errorMsg = _parseError(e);
+      });
     } finally {
-      setState(() { _loading = false; });
+      setState(() {
+        _loading = false;
+      });
     }
   }
 
@@ -87,7 +105,9 @@ class _TenantRegisterScreenState extends State<TenantRegisterScreen> {
     Future.doWhile(() async {
       await Future.delayed(const Duration(seconds: 1));
       if (!mounted) return false;
-      setState(() { _resendCountdown--; });
+      setState(() {
+        _resendCountdown--;
+      });
       return _resendCountdown > 0;
     });
   }
@@ -134,7 +154,6 @@ class _TenantRegisterScreenState extends State<TenantRegisterScreen> {
                 style: AppTextStyles.caption,
               ),
               const SizedBox(height: AppSpacing.xl),
-
               if (!_otpSent) ...[
                 TextFormField(
                   controller: _nameCtrl,
@@ -191,10 +210,9 @@ class _TenantRegisterScreenState extends State<TenantRegisterScreen> {
                           labelText: 'Numéro de téléphone',
                           hintText: '70 00 00 01',
                         ),
-                        validator: (v) =>
-                            (v == null || v.trim().isEmpty)
-                                ? 'Entrez votre numéro'
-                                : null,
+                        validator: (v) => (v == null || v.trim().isEmpty)
+                            ? 'Entrez votre numéro'
+                            : null,
                       ),
                     ),
                   ],
@@ -303,13 +321,11 @@ class _TenantRegisterScreenState extends State<TenantRegisterScreen> {
         ),
         child: Row(
           children: [
-            const Icon(Icons.error_outline,
-                color: AppColors.error, size: 18),
+            const Icon(Icons.error_outline, color: AppColors.error, size: 18),
             const SizedBox(width: 8),
             Expanded(
               child: Text(_errorMsg,
-                  style: const TextStyle(
-                      color: AppColors.error, fontSize: 13)),
+                  style: const TextStyle(color: AppColors.error, fontSize: 13)),
             ),
           ],
         ),

@@ -41,7 +41,10 @@ class _SetPinScreenState extends State<SetPinScreen> {
   }
 
   Future<void> _savePin(String pin) async {
-    setState(() { _loading = true; _errorMsg = ''; });
+    setState(() {
+      _loading = true;
+      _errorMsg = '';
+    });
     try {
       await _pinService.savePin(pin, widget.userType);
       if (mounted) {
@@ -58,7 +61,9 @@ class _SetPinScreenState extends State<SetPinScreen> {
         _pin = '';
       });
     } finally {
-      setState(() { _loading = false; });
+      setState(() {
+        _loading = false;
+      });
     }
   }
 
@@ -83,9 +88,8 @@ class _SetPinScreenState extends State<SetPinScreen> {
                   // ── Header vert
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.fromLTRB(
-                        AppSpacing.lg, AppSpacing.xl,
-                        AppSpacing.lg, AppSpacing.xl),
+                    padding: const EdgeInsets.fromLTRB(AppSpacing.lg,
+                        AppSpacing.xl, AppSpacing.lg, AppSpacing.xl),
                     decoration: const BoxDecoration(
                       color: AppColors.primary,
                       borderRadius: BorderRadius.only(
@@ -163,8 +167,8 @@ class _SetPinScreenState extends State<SetPinScreen> {
 
                   // ── Saisie PIN
                   Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.xl),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
                     child: _loading
                         ? const SizedBox(
                             height: 60,
@@ -210,8 +214,7 @@ class _SetPinScreenState extends State<SetPinScreen> {
                   if (_errorMsg.isNotEmpty)
                     Container(
                       margin: const EdgeInsets.fromLTRB(
-                          AppSpacing.lg, AppSpacing.md,
-                          AppSpacing.lg, 0),
+                          AppSpacing.lg, AppSpacing.md, AppSpacing.lg, 0),
                       padding: const EdgeInsets.all(AppSpacing.md),
                       decoration: BoxDecoration(
                         color: AppColors.error.withValues(alpha: 0.08),

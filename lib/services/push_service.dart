@@ -71,7 +71,8 @@ class PushService {
       );
 
       await _localNotifs
-          .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+          .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>()
           ?.createNotificationChannel(channel);
 
       FirebaseMessaging.onMessage.listen(_handleForegroundMessage);

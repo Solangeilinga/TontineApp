@@ -139,7 +139,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         style: OutlinedButton.styleFrom(
                           foregroundColor: Colors.white,
                           minimumSize: const Size(double.infinity, 52),
-                          side: const BorderSide(color: Colors.white, width: 1.5),
+                          side:
+                              const BorderSide(color: Colors.white, width: 1.5),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(14),
                           ),
@@ -160,8 +161,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                                 color: Colors.white.withValues(alpha: 0.3)),
                           ),
                           Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 12),
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
                             child: Text(
                               'Vous êtes membre ?',
                               style: TextStyle(
@@ -207,7 +207,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
                             decoration: TextDecoration.underline,
-                            decorationColor: Colors.white.withValues(alpha: 0.85),
+                            decorationColor:
+                                Colors.white.withValues(alpha: 0.85),
                           ),
                         ),
                       ),

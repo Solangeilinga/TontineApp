@@ -26,7 +26,8 @@ class ProfileService {
 
   /// Étape 1/2 : envoie un code par SMS au NOUVEAU numéro (pas à l'ancien).
   Future<void> tenantChangePhoneRequestOtp(String newPhone) async {
-    await _dio.post('/auth/tenant/phone/request-otp', data: {'newPhone': newPhone});
+    await _dio
+        .post('/auth/tenant/phone/request-otp', data: {'newPhone': newPhone});
   }
 
   /// Étape 2/2 : applique le changement si le code est correct. Notifie
@@ -68,7 +69,8 @@ class ProfileService {
 
   /// Étape 1/2 : envoie un code par SMS au NOUVEAU numéro.
   Future<void> memberChangePhoneRequestOtp(String newPhone) async {
-    await _dio.post('/auth/member/phone/request-otp', data: {'newPhone': newPhone});
+    await _dio
+        .post('/auth/member/phone/request-otp', data: {'newPhone': newPhone});
   }
 
   /// Étape 2/2 : applique le changement si le code est correct. Notifie

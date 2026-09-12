@@ -46,7 +46,8 @@ class ApiService {
         //  - de boucler si c'est l'appel /auth/refresh lui-même qui échoue
         //  - de tenter deux refresh en parallèle pour deux requêtes 401
         //    simultanées (mutex via _refreshFuture)
-        final isRefreshCall = error.requestOptions.path.contains('/auth/refresh');
+        final isRefreshCall =
+            error.requestOptions.path.contains('/auth/refresh');
         if (error.response?.statusCode == 401 && !isRefreshCall) {
           final refreshed = await _refreshAccessToken();
           if (refreshed != null) {
@@ -80,8 +81,7 @@ class ApiService {
     required String refreshToken,
     required String userType,
   }) async {
-    await _storage.write(
-        key: AppConstants.accessTokenKey, value: accessToken);
+    await _storage.write(key: AppConstants.accessTokenKey, value: accessToken);
     await _storage.write(
         key: AppConstants.refreshTokenKey, value: refreshToken);
     await _storage.write(key: AppConstants.userTypeKey, value: userType);
@@ -101,8 +101,7 @@ class ApiService {
   Future<String?> getAccessToken() =>
       _storage.read(key: AppConstants.accessTokenKey);
 
-  Future<String?> getUserType() =>
-      _storage.read(key: AppConstants.userTypeKey);
+  Future<String?> getUserType() => _storage.read(key: AppConstants.userTypeKey);
 
   Future<bool> isLoggedIn() async {
     final token = await getAccessToken();
@@ -123,7 +122,8 @@ class ApiService {
 
   Future<String?> _doRefresh() async {
     try {
-      final refreshToken = await _storage.read(key: AppConstants.refreshTokenKey);
+      final refreshToken =
+          await _storage.read(key: AppConstants.refreshTokenKey);
       if (refreshToken == null) return null;
 
       // dioNoAuth : ne doit PAS embarquer l'ancien (expiré) access token.
@@ -136,8 +136,10 @@ class ApiService {
       final newAccessToken = data['accessToken'] as String;
       final newRefreshToken = data['refreshToken'] as String;
 
-      await _storage.write(key: AppConstants.accessTokenKey, value: newAccessToken);
-      await _storage.write(key: AppConstants.refreshTokenKey, value: newRefreshToken);
+      await _storage.write(
+          key: AppConstants.accessTokenKey, value: newAccessToken);
+      await _storage.write(
+          key: AppConstants.refreshTokenKey, value: newRefreshToken);
 
       return newAccessToken;
     } catch (_) {
