@@ -73,14 +73,14 @@ class _IOSInstructions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return const Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text("Sur iPhone, l'installation se fait en 2 étapes depuis Safari :"),
-        const SizedBox(height: 12),
+        Text("Sur iPhone, l'installation se fait en 2 étapes depuis Safari :"),
+        SizedBox(height: 12),
         _Step(icon: Icons.ios_share, text: 'Appuie sur le bouton Partager'),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         _Step(icon: Icons.add_box_outlined, text: "Choisis « Sur l'écran d'accueil »"),
       ],
     );

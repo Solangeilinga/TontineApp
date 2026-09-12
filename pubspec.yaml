@@ -4,7 +4,13 @@ publish_to: 'none'
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.0.0 <4.0.0'
+  # >=3.3.0 requis pour les `extension type` (voir
+  # pwa_install_service_web.dart) — cette syntaxe existait avant en tant
+  # qu'expérimentation "inline-class" derrière un flag, stabilisée dans
+  # Dart 3.3. Sans ce minimum, le compilateur utilise la version de langage
+  # la plus basse autorisée (3.0) et refuse la syntaxe, même si le SDK
+  # installé est plus récent.
+  sdk: '>=3.3.0 <4.0.0'
 
 dependencies:
   flutter:
@@ -20,6 +26,13 @@ dependencies:
   # SPA, voir netlify.toml)
   flutter_web_plugins:
     sdk: flutter
+  # Remplace dart:html/dart:js_util (dépréciés, et dart:js_util a fini par
+  # ne plus être résolu du tout sur les SDK Dart récents — voir
+  # pwa_install_service_web.dart). Déjà présent en dépendance transitive via
+  # firebase_core_web/dio_web_adapter (résolu en 15.2.0 dans ce projet) —
+  # volontairement SANS contrainte de version fixe ici pour ne pas entrer en
+  # conflit avec cette résolution transitive existante.
+  web: any
 
   # HTTP / API
   dio: ^5.4.3
